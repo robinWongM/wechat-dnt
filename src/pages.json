@@ -1,0 +1,29 @@
+{
+  "pages": [
+    {
+      "path": "pages/index",
+      "style": {
+        "navigationBarTextStyle": "@foreground",
+        "backgroundColorTop": "@background",
+        "backgroundColorBottom": "@background",
+        "backgroundColorContent": "@background"
+      }
+    },
+    {
+      "path": "pages/result",
+      "style": {
+        "navigationBarTextStyle": "@foreground",
+        "backgroundColorTop": "@background",
+        "backgroundColorBottom": "@background",
+        "backgroundColorContent": "@background"
+      }
+    }
+  ],
+  "globalStyle": {
+    "navigationBarTextStyle": "@foreground",
+    "backgroundColorTop": "@background",
+    "backgroundColorBottom": "@background",
+    "backgroundColorContent": "@background",
+    "navigationStyle": "custom"
+  }
+}
