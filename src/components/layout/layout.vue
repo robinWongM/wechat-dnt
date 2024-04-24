@@ -1,6 +1,6 @@
 <template>
   <scroll-view type="list" :scroll-y="true" style="overflow-anchor: auto;" class="h-screen dark:bg-[#1e1e1e]"
-    :scroll-anchoring="true" :enhanced="true">
+    :scroll-anchoring="true" :enhanced="true" @dragging="onDragging" @dragend="onDragEnd" @scroll="onScroll">
     <view class="sticky top-0" :style="{ height: `${safeAreaTop}px` }" />
     <view class="pt-4 pb-safe text-black dark:text-white text-opacity-80">
       <view class="px-4 mb-4">
@@ -19,10 +19,13 @@
 </template>
 
 <script setup lang="ts">
-const { platform } = uni.getSystemInfoSync();
+import { useScroll } from '@/composables/scroll';
+
+const { onDragging, onDragEnd, onScroll } = useScroll();
+
+const { platform, statusBarHeight } = uni.getSystemInfoSync();
 const isPC = platform === 'windows' || platform === 'mac';
 
-const { statusBarHeight } = uni.getWindowInfo();
 const { top, bottom } = uni.getMenuButtonBoundingClientRect();
 const safeAreaTop = isPC ? 0 : bottom + top - (statusBarHeight ?? 0);
 </script>

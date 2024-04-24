@@ -12,20 +12,22 @@
       </view>
     </view>
     <view v-if="currentTab === 0" class="pb-32">
-      <view class="pb-safe fixed bottom-0 w-max z-50 transition-all" :class="isStable ? 'right-0' : 'right-0'">
-        <view
-          class="transition-all px-4 py-4 mb-4 flex flex-row justify-center items-center border border-r-0 border-black dark:border-white border-opacity-10 dark:border-opacity-20 backdrop-blur-lg bg-[#f7f7f7] dark:bg-[#1e1e1e] bg-opacity-40 dark:bg-opacity-40 rounded-l-2xl"
-          :class="isStable ? 'ease-in duration-300' : 'ease-out duration-100 opacity-20'"
-          >
-          <view class="text-left text-sm mr-4 leading-5 font-medium">
-            长按右图<br>前往「当心被夹」公众号<br>发送分享卡片
+      <root-portal>
+        <view class="text-black dark:text-white text-opacity-80 pb-safe fixed bottom-0 w-max z-50 transition-all" :class="!isScrolling ? 'right-0' : 'right-0'">
+          <view
+            class="transition-all px-4 py-4 mb-4 flex flex-row justify-center items-center border border-r-0 border-black dark:border-white border-opacity-10 dark:border-opacity-20 backdrop-blur-xl bg-[#f7f7f7] dark:bg-[#1e1e1e] bg-opacity-40 dark:bg-opacity-40 rounded-l-2xl"
+            :class="!isScrolling ? 'ease-in delay-500 duration-300' : 'duration-0 opacity-5'"
+            >
+            <view class="text-left text-sm mr-4 leading-5 font-medium">
+              长按右图<br>前往「当心被夹」公众号<br>发送分享卡片
+            </view>
+            <image class="w-16 h-16" src="../../assets/official-account.jpg" :show-menu-by-longpress="true"
+              mode="aspectFit" />
           </view>
-          <image class="w-16 h-16" src="../../assets/official-account.jpg" :show-menu-by-longpress="true"
-            mode="aspectFit" />
         </view>
-      </view>
+      </root-portal>
       <view class="px-4 text-xs opacity-60" id="instructions-official-account">通过此方法，你可以在不打开分享卡片的情况下，获得净化后的链接。</view>
-      <scroll-view type="list" :scroll-x="true" class="snap-x snap-mandatory" @scroll="onScroll">
+      <scroll-view type="list" :scroll-x="true" class="snap-x snap-mandatory" :enhanced="true" @dragging="onDragging" @dragend="onDragEnd" @scroll="onScroll">
         <view class="px-4 gap-x-2 grid grid-flow-col grid-rows-[auto_auto] w-max">
           <block v-for="({ label, imageUrl }, index) in officialAccountInstructions" :key="index">
             <view class="my-2">
@@ -57,7 +59,7 @@
 
 <script setup lang="ts">
 import { useTheme } from '@/composables/dark-mode';
-import { useIsStable } from '@/composables/is-stable';
+import { useScroll } from '@/composables/scroll';
 import { onLoad, onShareAppMessage } from '@dcloudio/uni-app';
 import { ref, computed, nextTick } from 'vue';
 
@@ -109,11 +111,7 @@ const emit = defineEmits<{
   (e: 'preserveScrollPosition', callback: () => void): void;
 }>();
 
-const officialAccountScrollX = ref(0);
-const { isStable } = useIsStable(officialAccountScrollX);
-const onScroll = ({ detail: { scrollLeft } }: { detail: { scrollLeft: number } }) => {
-  officialAccountScrollX.value = scrollLeft;
-}
+const { isScrolling, onDragging, onDragEnd, onScroll } = useScroll();
 
 
 const setCurrentTab = (index: number) => {
