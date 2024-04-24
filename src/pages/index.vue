@@ -10,7 +10,9 @@
           <view class="p-4 text-center" hover-class="bg-black bg-opacity-5 dark:bg-opacity-20" @click="clean">净化</view>
         </view>
       </view>
+      <!-- #ifdef MP-WEIXIN -->
       <instructions />
+      <!-- #endif -->
     </view>
   </layout>
 </template>

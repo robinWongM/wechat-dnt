@@ -1,6 +1,6 @@
 import { ref, computed } from "vue";
 
-const currentTheme = ref(uni.getAppBaseInfo().theme);
+const currentTheme = ref(uni.getSystemInfoSync().theme);
 uni.onThemeChange(({ theme }) => {
   currentTheme.value = theme;
 });

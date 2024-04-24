@@ -79,6 +79,18 @@
       }
     ]
   },
+  "mp-qq": {
+    "darkmode": true,
+    "styleIsolation": "apply-shared",
+    "supportedMaterials": [
+      {
+        "materialType": "text/html",
+        "name": "${nickname}",
+        "desc": "去除分享链接中恼人的跟踪参数。",
+        "path": "pages/result"
+      }
+    ]
+  },
   "mp-alipay": {
     "usingComponents": true
   },
