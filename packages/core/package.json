@@ -1,0 +1,8 @@
+{
+  "name": "@dnt/core",
+  "dependencies": {
+    "radix3": "^1.1.2",
+    "url-parse": "^1.5.10",
+    "valibot": "^0.30.0"
+  }
+}
