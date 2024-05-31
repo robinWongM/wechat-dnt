@@ -29,5 +29,8 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           push: true
+          context: packages/web
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
