@@ -83,11 +83,17 @@ export default defineEventHandler(async (event) => {
   await useMpAuth(event);
   console.log("Received event from MP");
 
-  const payload = await readValidatedBody(event, (body) => {
+  const { success, error, data } = await readValidatedBody(event, (body) => {
     console.log("Received body:", body);
-    return eventSchema.parse(body);
+    return eventSchema.safeParse(body);
   });
-  void handleMpEvent(payload);
+  if (!success) {
+    console.log("Failed to parse body:", error);
+  }
+
+  if (data) {
+    void handleMpEvent(data);
+  }
 
   return "";
 });
