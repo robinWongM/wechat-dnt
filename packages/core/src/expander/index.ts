@@ -4,6 +4,7 @@ const SHORT_LINK_DOMAINS = [
   'b23.tv',
   'xhslink.com',
   'm.tb.cn',
+  't.cn',
 ];
 
 export const isShortLink = (url: string) => {

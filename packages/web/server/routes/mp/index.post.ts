@@ -26,6 +26,31 @@ const eventSchema = string()
     }).transform(({ xml }) => xml)
   );
 
+const resolveShortLink = async (link: string, maxRedirectTimes = 10): Promise<string> => {
+  if (maxRedirectTimes <= 0) {
+    return link;
+  }
+
+  if (isShortLink(link)) {
+    const resp = await fetch(link, {
+      redirect: "manual",
+      headers: {
+        "User-Agent":
+          "Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Mobile/15E148 Safari/604.1",
+      },
+    });
+
+    const redirected = resp.headers.get("location");
+    if (redirected && isShortLink(redirected)) {
+      return resolveShortLink(redirected, maxRedirectTimes - 1);
+    }
+
+    return redirected || link;
+  }
+
+  return link;
+}
+
 const handleMpEvent = async (event: z.infer<typeof eventSchema>) => {
   const { MsgType, Event, FromUserName } = event;
 
@@ -38,7 +63,7 @@ const handleMpEvent = async (event: z.infer<typeof eventSchema>) => {
 
   if (MsgType === "text" || MsgType === "link") {
     const linkText = MsgType === "text" ? event.Content : event.Url;
-    const originalLink = linkText;
+    const originalLink = `${linkText}`;
 
     if (!originalLink) {
       return mpSendTextMessage(FromUserName, "无法识别链接。");
@@ -51,19 +76,9 @@ const handleMpEvent = async (event: z.infer<typeof eventSchema>) => {
       );
     }
 
-    let link = `${originalLink}`;
-    if (isShortLink(link)) {
-      const resp = await fetch(link, {
-        redirect: "manual",
-        headers: {
-          "User-Agent":
-            "Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Mobile/15E148 Safari/604.1",
-        },
-      });
-      if (resp.headers.has("location")) {
-        link = resp.headers.get("location")!;
-        void mpSendTextMessage(FromUserName, `重定向至：\n${link}`);
-      }
+    const link = await resolveShortLink(originalLink);
+    if (link !== originalLink) {
+      void mpSendTextMessage(FromUserName, `重定向至：\n${link}`);
     }
 
     const matchResult = match(link);
