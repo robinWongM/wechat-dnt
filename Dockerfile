@@ -9,6 +9,7 @@ COPY pnpm-lock.yaml pnpm-workspace.yaml ./
 RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm fetch
 COPY . ./
 RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --offline --frozen-lockfile
+RUN pnpm run build --filter=web
 RUN pnpm deploy --filter=web --prod /prod/web
 
 FROM cgr.dev/chainguard/node-lts:latest AS web
