@@ -5,7 +5,7 @@ RUN corepack enable
 
 FROM base AS build
 WORKDIR /build
-COPY pnpm-lock.yaml pnpm-workspace.yaml ./
+COPY .npmrc pnpm-lock.yaml pnpm-workspace.yaml ./
 RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm fetch
 COPY . ./
 RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --offline --frozen-lockfile
