@@ -14,8 +14,10 @@ const route = useRoute();
 
 const originalUrl = computed(() => {
   const urlInParams = route.params.url;
+  const queryParams = new URLSearchParams(route.query as Record<string, string>);
   const urlWithoutScheme = Array.isArray(urlInParams) ? urlInParams.join('/') : urlInParams;
-  return `https://${urlWithoutScheme}`;
+
+  return `https://${urlWithoutScheme}?${queryParams.toString()}`;
 });
 const sanitized = computed(() => match(originalUrl.value));
 </script>
