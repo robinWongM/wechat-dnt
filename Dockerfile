@@ -12,7 +12,7 @@ RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --offline --froze
 RUN pnpm run --filter=web build
 
 FROM cgr.dev/chainguard/node-lts:latest AS web
-COPY --from=build /build/packages/web /prod/web
+COPY --from=build /build/packages/web/.output /prod/web
 WORKDIR /prod/web
 EXPOSE 3000
-CMD ["node", ".output/server/index.mjs"]
+CMD ["server/index.mjs"]
