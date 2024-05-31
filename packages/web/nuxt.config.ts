@@ -21,6 +21,10 @@ export default defineNuxtConfig({
       appId: '',
       appSecret: '',
     },
+    qy: {
+      corpId: '',
+      corpSecret: '',
+    },
     wxa: {
       appId: '',
     }

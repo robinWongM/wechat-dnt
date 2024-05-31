@@ -1,6 +1,5 @@
 import { XMLParser } from "fast-xml-parser";
 import { z, object, string, number } from "zod";
-import { mpSendTextMessage } from "~/server/utils/external/mp";
 import { isShortLink, match } from "@dnt/core";
 import og from "open-graph-scraper";
 

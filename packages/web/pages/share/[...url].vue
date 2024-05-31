@@ -11,7 +11,6 @@
 import { match } from '@dnt/core';
 
 const route = useRoute();
-
 const originalUrl = computed(() => {
   const urlInParams = route.params.url;
   const queryParams = new URLSearchParams(route.query as Record<string, string>);
@@ -20,4 +19,17 @@ const originalUrl = computed(() => {
   return `https://${urlWithoutScheme}?${queryParams.toString()}`;
 });
 const sanitized = computed(() => match(originalUrl.value));
+
+const { config } = useWxSdk();
+const client = useNuxtApp().$client;
+const { data: wxConfig } = await client.getWxConfig.useQuery({
+  url: route.fullPath,
+});
+config({
+  ...wxConfig.value!,
+  debug: true,
+  jsApiList: ['updateAppMessageShareData'],
+  openTagList: [],
+});
+
 </script>

@@ -1,5 +1,5 @@
-const MP_ACCESS_TOKEN_ENDPOINT =
-  "https://api.weixin.qq.com/cgi-bin/stable_token";
+const QY_ACCESS_TOKEN_ENDPOINT =
+  "https://qyapi.weixin.qq.com/cgi-bin/gettoken";
 const MP_SEND_TEXT_ENDPOINT =
   "https://api.weixin.qq.com/cgi-bin/message/custom/send";
 
@@ -8,7 +8,7 @@ let expiresAt = 0;
 
 let refreshAccessTokenPromise: Promise<string> | null = null;
 
-const useMpAccessToken = () => {
+const useQyAccessToken = () => {
   if (Date.now() < expiresAt - 60 * 1000) {
     console.log("Using cached access token");
     return accessToken;
@@ -17,20 +17,14 @@ const useMpAccessToken = () => {
   if (!refreshAccessTokenPromise) {
     console.log("Refreshing access token");
     const {
-      mp: { appId, appSecret },
+      qy: { corpId, corpSecret },
     } = useRuntimeConfig();
 
-    refreshAccessTokenPromise = fetch(MP_ACCESS_TOKEN_ENDPOINT, {
-      method: "POST",
-      body: JSON.stringify({
-        secret: appSecret,
-        grant_type: "client_credential",
-        appid: appId,
-      }),
-      headers: {
-        "Content-Type": "application/json",
-      },
-    })
+    const url = new URL(QY_ACCESS_TOKEN_ENDPOINT);
+    url.searchParams.append("corpid", corpId);
+    url.searchParams.append("corpsecret", corpSecret);
+
+    refreshAccessTokenPromise = fetch(url)
       .then((resp) => resp.json())
       .then((resp: { access_token: string; expires_in: number }) => {
         console.log("Access token refreshed", resp);
@@ -50,10 +44,10 @@ const useMpAccessToken = () => {
   return refreshAccessTokenPromise;
 };
 
-export const mpSendTextMessage = async (toUser: string, content: string) => {
+export const qySendTextMessage = async (toUser: string, content: string) => {
   console.log("Sending text message to", toUser, ":", content);
 
-  const accessToken = await useMpAccessToken();
+  const accessToken = await useQyAccessToken();
   const payload = {
     touser: toUser,
     msgtype: "text",
