@@ -1,6 +1,6 @@
 import { XMLParser } from "fast-xml-parser";
 import { z, object, string, number } from "zod";
-import { isShortLink, match } from "@dnt/core";
+import { extractLink, isShortLink, match } from "@dnt/core";
 import og from "open-graph-scraper";
 import { appRouter } from "~/server/trpc/routers";
 import { createCallerFactory } from "@trpc/server";
@@ -63,7 +63,7 @@ const handleMpEvent = async (event: z.infer<typeof eventSchema>) => {
 
   if (MsgType === "text" || MsgType === "link") {
     const linkText = MsgType === "text" ? event.Content : event.Url;
-    const originalLink = `${linkText}`;
+    const originalLink = extractLink(`${linkText}`);
 
     if (!originalLink) {
       return mpSendTextMessage(FromUserName, "无法识别链接。");
