@@ -1,11 +1,11 @@
-FROM node:20-alpine as build
+FROM node:20 as build
 WORKDIR /app
 COPY package.json /app
 RUN npm install
 COPY . /app
 RUN npm run build
 
-FROM gcr.io/distroless/nodejs:20 as prod
+FROM cgr.dev/chainguard/node-lts:latest as prod
 WORKDIR /app
 COPY --from=build /app/.output/server /app/.output/server
 EXPOSE 3000/tcp
