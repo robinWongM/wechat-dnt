@@ -2,12 +2,13 @@ import {
   object,
   string,
   type Output,
-  ObjectSchema,
-  ObjectEntries,
-  BaseSchema,
-  StringSchema,
+  type ObjectSchema,
+  type BaseSchema,
+  type StringSchema,
+  safeParse,
 } from "valibot";
-import type { RadixRouter } from "radix3";
+import { createRegExp, oneOrMore, char } from "magic-regexp";
+import URLParse from "url-parse";
 
 // Type to parse a single segment of the path and extract the parameter name if it starts with ':'
 type ExtractParam<Segment extends string> = Segment extends `:${infer Param}`
@@ -31,14 +32,14 @@ type PartObject<
 
 type Expand<T> = T extends infer O ? { [K in keyof O]: O[K] } : never;
 
-type MatcherOutput = {
+type SanitizerOutput = {
   fullLink: string;
   shortLink?: string;
   universalLink?: string;
   customSchemeLink?: string;
 };
 
-class Matcher<
+class Sanitizer<
   Path extends string,
   Query extends ObjectSchema<{}>,
   Params extends ObjectSchema<{}> = ObjectSchema<PartObject<Path, StringSchema>>
@@ -46,16 +47,18 @@ class Matcher<
   matchedScheme = ["http", "https"];
   matchedHost: string[] = [];
   matchedPath = "";
+  matchedRegExp = /./;
 
   queryValidator = object({});
   paramsValidator = object({});
   outputCallback: (
     input: Output<ObjectSchema<{ query: Query; params: Params }>>
-  ) => MatcherOutput = () => {
+  ) => SanitizerOutput = () => {
     return {
       fullLink: "",
     };
   };
+  openGraphHandler: () => void = () => {};
 
   scheme(...scheme: string[]) {
     this.matchedScheme = scheme;
@@ -69,15 +72,16 @@ class Matcher<
 
   path<NewPath extends string>(path: NewPath) {
     this.matchedPath = path;
-    const newParams = this.getDefaultParamsValidator() as ObjectSchema<
-      PartObject<NewPath, StringSchema<string>>
-    >;
+    const { regExp, validator } = this.getDefaultParamsValidator();
+    this.matchedRegExp = regExp;
 
     return this.input({
       query: this.queryValidator,
       // @ts-ignore
-      params: newParams,
-    }) as unknown as Matcher<NewPath, Query>;
+      params: validator as ObjectSchema<
+        PartObject<NewPath, StringSchema<string>>
+      >,
+    }) as unknown as Sanitizer<NewPath, Query>;
   }
 
   input<
@@ -86,27 +90,46 @@ class Matcher<
   >({ query, params }: { query?: NewQuery; params?: NewParams }) {
     this.queryValidator = query || object({});
     this.paramsValidator = params || object({});
-    return this as unknown as Matcher<Path, NewQuery, NewParams>;
+    return this as unknown as Sanitizer<Path, NewQuery, NewParams>;
   }
 
   output(
     callback: (
       input: Output<ObjectSchema<{ query: Query; params: Params }>>
-    ) => MatcherOutput
+    ) => SanitizerOutput
   ): this {
     this.outputCallback = callback;
     return this;
   }
 
-  register(router: RadixRouter) {
-    const path = this.matchedPath;
-    for (const scheme of this.matchedScheme) {
-      for (const host of this.matchedHost) {
-        const prefix = `${scheme}/${host}${path}`;
-        console.log(prefix);
-        router.insert(`${scheme}/${host}${path}`, { matcher: this });
-      }
+  sanitize(parsedUrl: URLParse<any>) {
+    const { protocol, hostname, pathname, query } = parsedUrl;
+    const scheme = protocol.slice(0, -1);
+    if (!this.matchedScheme.includes(scheme)) {
+      return;
     }
+
+    if (!this.matchedHost.includes(hostname)) {
+      return;
+    }
+
+    const match = pathname.match(this.matchedRegExp);
+    if (!match) {
+      return;
+    }
+
+    const { success: paramSuccess, output: paramOutput } = safeParse(this.paramsValidator, match.groups || {});
+    if (!paramSuccess) {
+      return;
+    }
+
+    const { success: querySuccess, output: queryOutput } = safeParse(this.queryValidator, query || {});
+    if (!querySuccess) {
+      return;
+    }
+
+    // @ts-ignore
+    return this.outputCallback({ query: queryOutput, params: paramOutput });
   }
 
   constructor(...host: string[]) {
@@ -115,12 +138,32 @@ class Matcher<
 
   private getDefaultParamsValidator() {
     const segments = this.matchedPath.split("/");
-    const params = segments
-      .filter((segment) => segment.startsWith(":"))
-      .map((segment) => [segment.slice(1), string()]);
-    return object(Object.fromEntries(params));
+
+    const regExpPart: any[] = [];
+    const params: any = {};
+    for (const segment of segments.slice(1)) {
+      if (segment === '**') {
+        regExpPart.push(oneOrMore(char));
+        continue;
+      }
+
+      if (!segment.startsWith(":")) {
+        regExpPart.push('/', segment);
+        continue;
+      }
+
+      const paramName = segment.slice(1);
+      regExpPart.push('/', oneOrMore(char).groupedAs(paramName));
+      params[paramName] = string();
+    }
+
+    const regExp = createRegExp(...regExpPart);
+    return {
+      regExp,
+      validator: object(params),
+    };
   }
 }
 
-export const m = (...host: string[]) => new Matcher(...host);
-export type MatcherInstance = ReturnType<typeof m>;
+export const m = (...host: string[]) => new Sanitizer(...host);
+export type SanitizerInstance = ReturnType<typeof m>;

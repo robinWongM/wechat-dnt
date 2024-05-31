@@ -1,0 +1,30 @@
+{
+  "name": "nuxt-app",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "nuxt build",
+    "dev": "nuxt dev",
+    "generate": "nuxt generate",
+    "preview": "nuxt preview",
+    "postinstall": "nuxt prepare"
+  },
+  "dependencies": {
+    "@dnt/core": "workspace:*",
+    "@trpc/client": "^10.45.2",
+    "@trpc/server": "^10.45.2",
+    "nuxt": "^3.11.2",
+    "open-graph-scraper": "^6.5.1",
+    "trpc-nuxt": "^0.10.21",
+    "vue": "^3.4.27",
+    "vue-router": "^4.3.2",
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "@egoist/tailwindcss-icons": "^1.7.4",
+    "@iconify-json/lucide": "^1.1.183",
+    "@iconify-json/simple-icons": "^1.1.102",
+    "@nuxtjs/tailwindcss": "^6.12.0",
+    "tailwindcss-safe-area": "^0.5.1"
+  }
+}
