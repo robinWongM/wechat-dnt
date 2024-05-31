@@ -13,6 +13,9 @@ export default defineNuxtConfig({
     }
   },
   runtimeConfig: {
+    web: {
+      baseUrl: '',
+    },
     mp: {
       token: '',
       appId: '',

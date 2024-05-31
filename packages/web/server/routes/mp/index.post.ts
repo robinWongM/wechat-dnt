@@ -4,7 +4,9 @@ import { mpSendTextMessage } from "~/server/utils/external/mp";
 import { isShortLink, match } from "@dnt/core";
 import og from "open-graph-scraper";
 
-const xmlParser = new XMLParser();
+const xmlParser = new XMLParser({
+  parseTagValue: false,
+});
 
 const eventSchema = string()
   .transform((xml) => xmlParser.parse(xml))
@@ -43,11 +45,11 @@ const handleMpEvent = async (event: z.infer<typeof eventSchema>) => {
     if (MsgType === "link") {
       void mpSendTextMessage(
         FromUserName,
-        `你发送的 URL 是: \n${originalLink}\n\n`
+        `你发送的 URL 是: \n${originalLink}`
       );
     }
 
-    let link = originalLink;
+    let link = `${originalLink}`;
     if (isShortLink(link)) {
       const resp = await fetch(link, {
         redirect: "manual",
@@ -58,7 +60,7 @@ const handleMpEvent = async (event: z.infer<typeof eventSchema>) => {
       });
       if (resp.headers.has("location")) {
         link = resp.headers.get("location")!;
-        void mpSendTextMessage(FromUserName, `重定向至：\n${link}\n\n`);
+        void mpSendTextMessage(FromUserName, `重定向至：\n${link}`);
       }
     }
 
@@ -72,9 +74,22 @@ const handleMpEvent = async (event: z.infer<typeof eventSchema>) => {
       return mpSendTextMessage(FromUserName, "获取链接信息失败。");
     }
 
-    return mpSendTextMessage(
+    void mpSendTextMessage(
       FromUserName,
       `${result.ogTitle}\n${matchResult.fullLink}`
+    );
+
+    const parsedUrl = new URL(matchResult.fullLink);
+    const shareUrl = new URL(
+      `${parsedUrl.host}${parsedUrl.pathname}`,
+      useRuntimeConfig().web.baseUrl,
+    );
+    for (const key of parsedUrl.searchParams.keys()) {
+      shareUrl.searchParams.set(key, parsedUrl.searchParams.get(key)!);
+    }
+    void mpSendTextMessage(
+      FromUserName,
+      `<a href="${shareUrl.toString()}">轻触此处创建分享卡片</a>`
     );
   }
 };
