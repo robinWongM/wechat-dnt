@@ -1,9 +1,9 @@
 FROM node:20 as build
 WORKDIR /app
 COPY package.json /app
-RUN npm install
+RUN corepack enable pnpm && pnpm install
 COPY . /app
-RUN npm run build
+RUN pnpm run build
 
 FROM cgr.dev/chainguard/node-lts:latest as prod
 WORKDIR /app
