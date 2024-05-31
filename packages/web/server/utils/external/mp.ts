@@ -10,10 +10,12 @@ let refreshAccessTokenPromise: Promise<string> | null = null;
 
 const useMpAccessToken = () => {
   if (Date.now() < expiresAt - 60 * 1000) {
+    console.log("Using cached access token");
     return accessToken;
   }
 
   if (!refreshAccessTokenPromise) {
+    console.log("Refreshing access token");
     const {
       mp: { appId, appSecret },
     } = useRuntimeConfig();
@@ -24,13 +26,14 @@ const useMpAccessToken = () => {
         secret: appSecret,
         grant_type: "client_credential",
         appid: appId,
-      }),
+      }).toString(),
       headers: {
         "Content-Type": "application/x-www-form-urlencoded",
       },
     })
       .then((resp) => resp.json())
       .then((resp: { access_token: string; expires_in: number }) => {
+        console.log("Access token refreshed");
         accessToken = resp.access_token;
         expiresAt = Date.now() + resp.expires_in * 1000;
         return accessToken;
@@ -48,6 +51,8 @@ const useMpAccessToken = () => {
 };
 
 export const mpSendTextMessage = async (toUser: string, content: string) => {
+  console.log("Sending text message to", toUser, ":", content);
+
   const accessToken = await useMpAccessToken();
   const payload = {
     touser: toUser,
