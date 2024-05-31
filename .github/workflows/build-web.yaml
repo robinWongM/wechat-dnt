@@ -26,14 +26,12 @@ jobs:
       - name: Docker meta
         id: meta
         uses: docker/metadata-action@v5
-        with:
-          images: ghcr.io/robinwongm/wechat-dnt/web
       - name: Build and push
         uses: docker/build-push-action@v5
         with:
           push: true
           target: web
-          tags: ${{ steps.meta.outputs.tags }}
+          tags: ghcr.io/robinwongm/wechat-dnt:web-latest
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
