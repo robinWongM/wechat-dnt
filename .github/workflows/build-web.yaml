@@ -8,6 +8,7 @@ on:
       - 'packages/web/**'
       - 'Dockerfile'
       - '.github/workflows/build-web.yaml'
+  workflow_dispatch:
 
 jobs:
   docker:
