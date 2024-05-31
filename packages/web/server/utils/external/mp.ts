@@ -35,7 +35,10 @@ const useMpAccessToken = () => {
         expiresAt = Date.now() + resp.expires_in * 1000;
         return accessToken;
       })
-      .catch(console.error)
+      .catch((err) => {
+        console.error(err);
+        throw err;
+      })
       .finally(() => {
         refreshAccessTokenPromise = null;
       });
