@@ -81,7 +81,7 @@ const handleMpEvent = async (event: z.infer<typeof eventSchema>) => {
 
     const parsedUrl = new URL(matchResult.fullLink);
     const shareUrl = new URL(
-      `${parsedUrl.host}${parsedUrl.pathname}`,
+      `/share/${parsedUrl.host}${parsedUrl.pathname}`,
       useRuntimeConfig().web.baseUrl,
     );
     for (const key of parsedUrl.searchParams.keys()) {
