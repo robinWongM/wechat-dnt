@@ -2,10 +2,13 @@ import { XMLParser } from "fast-xml-parser";
 import { z, object, string, number } from "zod";
 import { isShortLink, match } from "@dnt/core";
 import og from "open-graph-scraper";
+import { appRouter } from "~/server/trpc/routers";
+import { createCallerFactory } from "@trpc/server";
 
 const xmlParser = new XMLParser({
   parseTagValue: false,
 });
+const trpcCaller = createCallerFactory()(appRouter)({});
 
 const eventSchema = string()
   .transform((xml) => xmlParser.parse(xml))
@@ -68,8 +71,8 @@ const handleMpEvent = async (event: z.infer<typeof eventSchema>) => {
       return mpSendTextMessage(FromUserName, "暂不支持此链接。");
     }
 
-    const { result, error } = await og({ url: matchResult.fullLink });
-    if (error) {
+    const result = await trpcCaller.scrape({ url: matchResult.fullLink });
+    if (!result) {
       return mpSendTextMessage(FromUserName, "获取链接信息失败。");
     }
 
