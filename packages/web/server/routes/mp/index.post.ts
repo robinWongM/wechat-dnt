@@ -15,9 +15,9 @@ const eventSchema = string()
         ToUserName: string(),
         CreateTime: string().or(number()),
         MsgType: string().or(number()),
-        Content: string().or(number()),
-        Url: string(),
-        Event: string(),
+        Content: string().or(number()).optional(),
+        Url: string().optional(),
+        Event: string().optional(),
       }),
     }).transform(({ xml }) => xml)
   );
