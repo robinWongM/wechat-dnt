@@ -1,3 +1,4 @@
+import { match } from '@dnt/core';
 import URLParse from 'url-parse';
 
 const XOR_CODE = 23442827791579n;
@@ -138,11 +139,6 @@ export function cleanUrl(rawUrl?: string) {
     return;
   }
 
-  const url = newUrl(rawUrl);
-  const result = cleanUrlBiliBili(url) ||
-    cleanUrlWeChatMp(url) ||
-    cleanUrlTaobao(url) ||
-    cleanUrlDouyin(url) ||
-    cleanUrlPotato(url);
+  const result = match(rawUrl);
   return result;
 }
