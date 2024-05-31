@@ -39,6 +39,10 @@ export const appRouter = router({
         },
       });
 
+      if (openGraph.error) {
+        console.error(openGraph.error);
+      }
+
       return openGraph.result;
     }),
 
