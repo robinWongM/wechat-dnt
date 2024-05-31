@@ -20,16 +20,17 @@ const originalUrl = computed(() => {
 });
 const sanitized = computed(() => match(originalUrl.value));
 
-const { config } = useWxSdk();
-const client = useNuxtApp().$client;
-const { data: wxConfig } = await client.getWxConfig.useQuery({
-  url: route.fullPath,
-});
-config({
-  ...wxConfig.value!,
-  debug: true,
-  jsApiList: ['updateAppMessageShareData'],
-  openTagList: [],
-});
-
+if (import.meta.client) {
+  const { config } = useWxSdk();
+  const client = useNuxtApp().$client;
+  const { data: wxConfig } = await client.getWxConfig.useQuery({
+    url: location.href,
+  });
+  config({
+    ...wxConfig.value!,
+    debug: true,
+    jsApiList: ['updateAppMessageShareData'],
+    openTagList: [],
+  });
+}
 </script>
