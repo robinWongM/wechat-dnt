@@ -6,6 +6,10 @@ on:
       - 'main'
     paths:
       - 'packages/web/**'
+      - 'packages/core/**'
+      - 'package.json'
+      - 'pnpm-workspace.yaml'
+      - 'pnpm-lock.yaml'
       - 'Dockerfile'
       - '.github/workflows/build-web.yaml'
   workflow_dispatch:

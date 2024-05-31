@@ -11,5 +11,15 @@ export default defineNuxtConfig({
         target: 'esnext'
       }
     }
+  },
+  runtimeConfig: {
+    mp: {
+      token: '',
+      appId: '',
+      appSecret: '',
+    },
+    wxa: {
+      appId: '',
+    }
   }
 })
