@@ -22,18 +22,18 @@ const useMpAccessToken = () => {
 
     refreshAccessTokenPromise = fetch(MP_ACCESS_TOKEN_ENDPOINT, {
       method: "POST",
-      body: new URLSearchParams({
+      body: JSON.stringify({
         secret: appSecret,
         grant_type: "client_credential",
         appid: appId,
-      }).toString(),
+      }),
       headers: {
-        "Content-Type": "application/x-www-form-urlencoded",
+        "Content-Type": "application/json",
       },
     })
       .then((resp) => resp.json())
       .then((resp: { access_token: string; expires_in: number }) => {
-        console.log("Access token refreshed");
+        console.log("Access token refreshed", resp);
         accessToken = resp.access_token;
         expiresAt = Date.now() + resp.expires_in * 1000;
         return accessToken;
