@@ -24,6 +24,7 @@ export const appRouter = router({
     .query(async ({ input }) => {
       const openGraph = await og({
         url: input.url,
+        onlyGetOpenGraphInfo: true,
         fetchOptions: {
           headers: {
             Accept:
@@ -37,11 +38,10 @@ export const appRouter = router({
               "Mozilla/5.0 (iPhone; CPU iPhone OS 17_5_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.5 Mobile/15E148 Safari/604.1",
           },
         },
-      });
-
-      if (openGraph.error) {
-        console.error(openGraph.error);
-      }
+      }).catch((err) => {
+        console.error(err);
+        throw err;
+      })
 
       return openGraph.result;
     }),

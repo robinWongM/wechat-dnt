@@ -91,7 +91,7 @@ const { data } = await $client.sanitize.useQuery({
   text: props.url,
 });
 
-const { data: openGraphData, } = await $client.scrape.useQuery({
+const { data: openGraphData } = await $client.scrape.useQuery({
   url: data.value?.fullLink,
 });
 
