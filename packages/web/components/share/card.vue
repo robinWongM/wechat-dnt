@@ -91,7 +91,30 @@ const { data } = await $client.sanitize.useQuery({
   text: props.url,
 });
 
-const { data: openGraphData } = await $client.scrape.useQuery({
+const { data: openGraphData, } = await $client.scrape.useQuery({
   url: data.value?.fullLink,
+});
+
+onMounted(async () => {
+  if (import.meta.client) {
+    const { config, updateAppMessageShareData } = useWxSdk();
+    const client = useNuxtApp().$client;
+    const wxConfig = await client.getWxConfig.query({
+      url: location.href,
+    });
+
+    await config({
+      ...wxConfig!,
+      debug: true,
+      jsApiList: ['updateAppMessageShareData'],
+      openTagList: [],
+    });
+    await updateAppMessageShareData({
+      title: openGraphData.value?.ogTitle,
+      desc: openGraphData.value?.ogDescription,
+      link: location.href,
+      imgUrl: openGraphData.value?.ogImage?.[0]?.url,
+    });
+  }
 });
 </script>

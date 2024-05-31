@@ -19,18 +19,4 @@ const originalUrl = computed(() => {
   return `https://${urlWithoutScheme}?${queryParams.toString()}`;
 });
 const sanitized = computed(() => match(originalUrl.value));
-
-if (import.meta.client) {
-  const { config } = useWxSdk();
-  const client = useNuxtApp().$client;
-  const { data: wxConfig } = await client.getWxConfig.useQuery({
-    url: location.href,
-  });
-  config({
-    ...wxConfig.value!,
-    debug: true,
-    jsApiList: ['updateAppMessageShareData'],
-    openTagList: [],
-  });
-}
 </script>

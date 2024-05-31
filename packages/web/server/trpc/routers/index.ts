@@ -51,9 +51,8 @@ export const appRouter = router({
       const timestamp = Math.floor(Date.now() / 1000);
 
       const sha1 = createHash("sha1");
-      sha1.update(
-        `jsapi_ticket=${ticket}&noncestr=${nonceStr}&timestamp=${timestamp}&url=${url}`
-      );
+      const toBeSigned = `jsapi_ticket=${ticket}&noncestr=${nonceStr}&timestamp=${timestamp}&url=${url}`;
+      sha1.update(toBeSigned);
       const signature = sha1.digest("hex");
 
       return {
