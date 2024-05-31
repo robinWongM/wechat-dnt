@@ -19,9 +19,10 @@ env:
   IMAGE_NAME: ${{ github.repository }}
 
 permissions:
-  contents: write
+  contents: read
   packages: write
   id-token: write
+  attestations: write
 
 jobs:
   docker:
