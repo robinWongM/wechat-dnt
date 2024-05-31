@@ -81,10 +81,12 @@ const handleMpEvent = async (event: z.infer<typeof eventSchema>) => {
 
 export default defineEventHandler(async (event) => {
   await useMpAuth(event);
+  console.log("Received event from MP");
 
-  const payload = await readValidatedBody(event, (body) =>
-    eventSchema.parse(body)
-  );
+  const payload = await readValidatedBody(event, (body) => {
+    console.log("Received body:", body);
+    return eventSchema.parse(body);
+  });
   void handleMpEvent(payload);
 
   return "";

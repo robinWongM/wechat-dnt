@@ -66,5 +66,8 @@ export const mpSendTextMessage = async (toUser: string, content: string) => {
         "Content-Type": "application/json",
       },
     }
-  );
+  ).catch((err) => {
+    console.error(err);
+    throw err;
+  });
 }
