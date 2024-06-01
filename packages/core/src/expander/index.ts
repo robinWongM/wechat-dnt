@@ -2,6 +2,7 @@ import URLParse from "url-parse";
 
 const SHORT_LINK_DOMAINS = [
   'b23.tv',
+  'b22.top',
   'xhslink.com',
   'm.tb.cn',
   't.cn',
