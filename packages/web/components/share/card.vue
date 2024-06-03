@@ -69,7 +69,7 @@
 
         </a>
         <a class="flex-1 flex flex-row items-center gap-2 rounded-2xl bg-white dark:bg-white dark:bg-opacity-5 p-4 active:bg-opacity-20 transition-colors"
-          :href="data?.fullLink">
+          :href="data?.fullLink" referrerpolicy="no-referrer">
           <i class="i-lucide-arrow-right w-4 h-4"></i>
           <div class="flex flex-col items-end flex-1 text-right">
             <span class="text-base">直接打开</span>
