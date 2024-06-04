@@ -1,13 +1,8 @@
-import { XMLParser } from "fast-xml-parser";
 import { z, object, string, number } from "zod";
 import { extractLink, isShortLink, match } from "@dnt/core";
-import og from "open-graph-scraper";
 import { appRouter } from "~/server/trpc/routers";
 import { createCallerFactory } from "@trpc/server";
 
-const xmlParser = new XMLParser({
-  parseTagValue: false,
-});
 const trpcCaller = createCallerFactory()(appRouter)({});
 
 const eventJsonSchema = object({
@@ -19,14 +14,6 @@ const eventJsonSchema = object({
   Url: string().optional(),
   Event: string().optional(),
 });
-
-const eventSchema = string()
-  .transform((xml) => xmlParser.parse(xml))
-  .pipe(
-    object({
-      xml: eventJsonSchema,
-    }).transform(({ xml }) => xml)
-  );
 
 const resolveShortLink = async (
   link: string,
