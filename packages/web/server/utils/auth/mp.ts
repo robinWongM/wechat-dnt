@@ -12,7 +12,6 @@ const mpEncryptedQuerySchema = object({
   msg_signature: string(),
   timestamp: string(),
   nonce: string(),
-  openid: string(),
 });
 const mpEncryptedBodySchema = object({
   ToUserName: string(),
@@ -47,7 +46,7 @@ export const useMpEncryptedMessage = async (event: H3Event) => {
     mp: { token, aesKey },
   } = useRuntimeConfig(event);
 
-  const { msg_signature, timestamp, nonce, openid } = await getValidatedQuery(
+  const { msg_signature, timestamp, nonce } = await getValidatedQuery(
     event,
     (query) => mpEncryptedQuerySchema.parse(query)
   );
@@ -68,8 +67,8 @@ export const useMpEncryptedMessage = async (event: H3Event) => {
   }
 
   const decodedKey = Buffer.from(aesKey + "=", "base64");
-  const aes = createDecipheriv("aes-256-cbc", decodedKey, null);
-  const decrypted = Buffer.concat([aes.update(Encrypt, "base64"), aes.final()]);
+  const aes = createDecipheriv("aes-256-cbc", decodedKey, decodedKey.subarray(0, 16));
+  const decrypted = aes.update(Encrypt, "base64");
 
   const msgLength = decrypted.readUInt32BE(16);
   const message = decrypted.subarray(20, 20 + msgLength).toString("utf8");
