@@ -10,23 +10,28 @@ const xmlParser = new XMLParser({
 });
 const trpcCaller = createCallerFactory()(appRouter)({});
 
+const eventJsonSchema = object({
+  FromUserName: string(),
+  ToUserName: string(),
+  CreateTime: string().or(number()),
+  MsgType: string().or(number()),
+  Content: string().or(number()).optional(),
+  Url: string().optional(),
+  Event: string().optional(),
+});
+
 const eventSchema = string()
   .transform((xml) => xmlParser.parse(xml))
   .pipe(
     object({
-      xml: object({
-        FromUserName: string(),
-        ToUserName: string(),
-        CreateTime: string().or(number()),
-        MsgType: string().or(number()),
-        Content: string().or(number()).optional(),
-        Url: string().optional(),
-        Event: string().optional(),
-      }),
+      xml: eventJsonSchema,
     }).transform(({ xml }) => xml)
   );
 
-const resolveShortLink = async (link: string, maxRedirectTimes = 10): Promise<string> => {
+const resolveShortLink = async (
+  link: string,
+  maxRedirectTimes = 10
+): Promise<string> => {
   if (maxRedirectTimes <= 0) {
     return link;
   }
@@ -49,9 +54,9 @@ const resolveShortLink = async (link: string, maxRedirectTimes = 10): Promise<st
   }
 
   return link;
-}
+};
 
-const handleMpEvent = async (event: z.infer<typeof eventSchema>) => {
+const handleMpEvent = async (event: z.infer<typeof eventJsonSchema>) => {
   const { MsgType, Event, FromUserName } = event;
 
   if (MsgType === "event" && Event === "subscribe") {
@@ -99,7 +104,7 @@ const handleMpEvent = async (event: z.infer<typeof eventSchema>) => {
     const parsedUrl = new URL(matchResult.fullLink);
     const shareUrl = new URL(
       `/share/${parsedUrl.host}${parsedUrl.pathname}`,
-      useRuntimeConfig().web.baseUrl,
+      useRuntimeConfig().web.baseUrl
     );
     for (const key of parsedUrl.searchParams.keys()) {
       shareUrl.searchParams.set(key, parsedUrl.searchParams.get(key)!);
@@ -112,13 +117,10 @@ const handleMpEvent = async (event: z.infer<typeof eventSchema>) => {
 };
 
 export default defineEventHandler(async (event) => {
-  await useMpAuth(event);
+  const message = await useMpEncryptedMessage(event);
   console.log("Received event from MP");
 
-  const { success, error, data } = await readValidatedBody(event, (body) => {
-    console.log("Received body:", body);
-    return eventSchema.safeParse(body);
-  });
+  const { data, error, success } = eventJsonSchema.safeParse(message);
   if (!success) {
     console.log("Failed to parse body:", error);
   }

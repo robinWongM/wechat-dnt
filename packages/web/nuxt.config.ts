@@ -18,6 +18,7 @@ export default defineNuxtConfig({
     },
     mp: {
       token: '',
+      aesKey: '',
       appId: '',
       appSecret: '',
     },
