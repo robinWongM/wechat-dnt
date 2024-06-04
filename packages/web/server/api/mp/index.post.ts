@@ -1,19 +1,30 @@
+import { XMLParser } from "fast-xml-parser";
 import { z, object, string, number } from "zod";
 import { extractLink, isShortLink, match } from "@dnt/core";
+import og from "open-graph-scraper";
 import { appRouter } from "~/server/trpc/routers";
 import { createCallerFactory } from "@trpc/server";
 
-const trpcCaller = createCallerFactory()(appRouter)({});
-
-const eventJsonSchema = object({
-  FromUserName: string(),
-  ToUserName: string(),
-  CreateTime: string().or(number()),
-  MsgType: string().or(number()),
-  Content: string().or(number()).optional(),
-  Url: string().optional(),
-  Event: string().optional(),
+const xmlParser = new XMLParser({
+  parseTagValue: false,
 });
+
+const eventSchema = string()
+  .transform((xml) => xmlParser.parse(xml))
+  .pipe(
+    object({
+      xml: object({
+        FromUserName: string(),
+        ToUserName: string(),
+        CreateTime: string().or(number()),
+        MsgType: string().or(number()),
+        Content: string().or(number()).optional(),
+        Url: string().optional(),
+        Event: string().optional(),
+      }),
+    }).transform(({ xml }) => xml)
+  );
+const trpcCaller = createCallerFactory()(appRouter)({});
 
 const resolveShortLink = async (
   link: string,
@@ -43,7 +54,7 @@ const resolveShortLink = async (
   return link;
 };
 
-const handleMpEvent = async (event: z.infer<typeof eventJsonSchema>) => {
+const handleMpEvent = async (event: z.infer<typeof eventSchema>) => {
   const { MsgType, Event, FromUserName } = event;
 
   if (MsgType === "event" && Event === "subscribe") {
@@ -107,7 +118,7 @@ export default defineEventHandler(async (event) => {
   const message = await useMpEncryptedMessage(event);
   console.log("Received event from MP");
 
-  const { data, error, success } = eventJsonSchema.safeParse(message);
+  const { data, error, success } = eventSchema.safeParse(message);
   if (!success) {
     console.log("Failed to parse body:", error);
   }
