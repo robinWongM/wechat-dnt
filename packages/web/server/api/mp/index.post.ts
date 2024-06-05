@@ -95,7 +95,7 @@ const handleMpEvent = async (event: z.infer<typeof eventSchema>) => {
 
     void mpSendTextMessage(
       FromUserName,
-      `${result.ogTitle}\n${matchResult.fullLink}`
+      `${result.title}\n${matchResult.fullLink}`
     );
 
     const parsedUrl = new URL(matchResult.fullLink);

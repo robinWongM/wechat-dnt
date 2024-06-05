@@ -84,7 +84,7 @@ function getReadLink(cvId: number) {
 // Rewrite into new format
 export default defineRouter(
   {
-    name: "bilibili",
+    name: "BiliBili",
   },
 
   defineHandler({
@@ -142,9 +142,11 @@ export default defineRouter(
         stat: { view, danmaku, like },
       } = videoData;
 
+      const description = desc === '-' ? '' : desc;
+
       return {
         title,
-        description: desc,
+        description,
         images: [pic],
         metadata: [
           { label: "UP 主", icon: "", value: name },

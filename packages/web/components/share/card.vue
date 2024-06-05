@@ -17,7 +17,7 @@
       </div>
       <div v-if="openGraphData?.description" class="mt-4 rounded-2xl overflow-hidden bg-[#f7f7f7] dark:bg-white dark:bg-opacity-5">
         <div class="px-4 pt-3 pb-4">
-          <div class="mt-1 opacity-90 text-sm">
+          <div class="mt-1 opacity-90 text-sm whitespace-pre-line">
             {{ openGraphData?.description }}
           </div>
         </div>
@@ -90,9 +90,15 @@ onMounted(async () => {
       jsApiList: ['updateAppMessageShareData'],
       openTagList: [],
     });
+
+    const description = [
+      `🔗 分享自 ${openGraphData.value?.name}`,
+      `💬 ${openGraphData.value?.description}`,
+    ].join('\n');
+
     await updateAppMessageShareData({
       title: openGraphData.value?.title || '',
-      desc: openGraphData.value?.description || '',
+      desc: description,
       link: location.href,
       imgUrl: openGraphData.value?.images?.[0] || '',
     });
