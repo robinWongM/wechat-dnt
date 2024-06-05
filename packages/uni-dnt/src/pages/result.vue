@@ -41,7 +41,7 @@
 </template>
 
 <script setup lang="ts">
-import { match } from '@dnt/core';
+import { sanitize } from '@dnt/core';
 import { onLoad } from '@dcloudio/uni-app';
 import { computed, onUnmounted, ref } from 'vue';
 
@@ -50,7 +50,7 @@ defineOptions({
 });
 
 const originalUrl = ref<string | undefined>('');
-const result = computed(() => match(originalUrl.value ?? '') ?? '');
+const result = computed(() => sanitize(originalUrl.value ?? '') ?? '');
 const keyboardHeight = ref(0);
 
 onLoad((options) => {

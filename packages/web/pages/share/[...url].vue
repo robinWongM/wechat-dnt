@@ -8,7 +8,7 @@
 </template>
 
 <script setup lang="ts">
-import { match } from '@dnt/core';
+import { sanitize } from '@dnt/core';
 
 const route = useRoute();
 const originalUrl = computed(() => {
@@ -18,5 +18,5 @@ const originalUrl = computed(() => {
 
   return `https://${urlWithoutScheme}?${queryParams.toString()}`;
 });
-const sanitized = computed(() => match(originalUrl.value));
+const sanitized = computed(() => sanitize(originalUrl.value));
 </script>

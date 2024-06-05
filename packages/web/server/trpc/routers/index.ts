@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { publicProcedure, router } from "../trpc";
-import { match } from "@dnt/core";
+import { sanitize } from "@dnt/core";
 import { createHash } from "node:crypto";
 import og from "open-graph-scraper";
 
@@ -12,7 +12,7 @@ export const appRouter = router({
       })
     )
     .query(({ input }) => {
-      return match(input.text);
+      return sanitize(input.text);
     }),
 
   scrape: publicProcedure
