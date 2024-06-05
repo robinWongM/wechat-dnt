@@ -12,8 +12,8 @@ import {
 import { stringify } from "querystringify";
 import { defineHandler, defineRouter } from "../utils/router";
 import dayjs from "dayjs";
-import dayjsDuration from "dayjs/plugin/duration";
-import dayjsRelativeTime from "dayjs/plugin/relativeTime";
+import dayjsDuration from "dayjs/plugin/duration.js";
+import dayjsRelativeTime from "dayjs/plugin/relativeTime.js";
 import "dayjs/locale/zh-cn";
 import { parseModule } from "esprima";
 
