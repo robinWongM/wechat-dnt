@@ -59,7 +59,7 @@ export const appRouter = router({
 
       return {
         ...result,
-        name: matchResult.config.name,
+        config: matchResult.config,
       }
     }),
 

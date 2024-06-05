@@ -1,9 +1,7 @@
 <template>
   <div class="px-4 pt-6 pb-safe-offset-36">
     <div class="flex flex-row gap-2 w-full">
-      <i class="flex-none i-lucide-link w-8 h-8" :class="{
-        'i-simple-icons-bilibili': openGraphData?.name === 'bilibili',
-      }"></i>
+      <i class="flex-none i-lucide-link w-8 h-8" :class="openGraphData?.config.icon"></i>
     </div>
     <div class="mt-6">
       <img v-if="openGraphData?.images?.[0]" :src="openGraphData?.images?.[0]" alt="" referrerpolicy="no-referrer"
@@ -15,7 +13,8 @@
           <div class="text-sm">{{ metadata.value }}</div>
         </div>
       </div>
-      <div v-if="openGraphData?.description" class="mt-4 rounded-2xl overflow-hidden bg-[#f7f7f7] dark:bg-white dark:bg-opacity-5">
+      <div v-if="openGraphData?.description"
+        class="mt-4 rounded-2xl overflow-hidden bg-[#f7f7f7] dark:bg-white dark:bg-opacity-5">
         <div class="px-4 pt-3 pb-4">
           <div class="mt-1 opacity-90 text-sm whitespace-pre-line">
             {{ openGraphData?.description }}
@@ -92,8 +91,8 @@ onMounted(async () => {
     });
 
     const description = [
-      `🔗 分享自 ${openGraphData.value?.name}`,
-      `💬 ${openGraphData.value?.description}`,
+      `✨ 分享自 ${openGraphData.value?.config.name}`,
+      `📝 ${openGraphData.value?.description}`,
     ].join('\n');
 
     await updateAppMessageShareData({

@@ -163,6 +163,9 @@ importers:
       '@dnt/core':
         specifier: workspace:*
         version: link:../core
+      '@nuxtjs/robots':
+        specifier: ^3.0.0
+        version: 3.0.0(rollup@4.18.0)
       '@trpc/client':
         specifier: ^10.45.2
         version: 10.45.2(@trpc/server@10.45.2)
@@ -1666,6 +1669,9 @@ packages:
     engines: {node: ^14.18.0 || >=16.10.0}
     peerDependencies:
       vue: ^3.3.4
+
+  '@nuxtjs/robots@3.0.0':
+    resolution: {integrity: sha512-qsHGW1KXBvV5Kq7u3huPnFCUTbHS4Fk8Za2mNPgmUXcwLgp3exvhPtdZfIdjrCF/aZk3A8OZONNmGghs6CecBA==}
 
   '@nuxtjs/tailwindcss@6.12.0':
     resolution: {integrity: sha512-vXvEq8z177TQcx0tc10mw3O6T9WeN0iTL8hIKGDfidmr+HKReexJU01aPgHefFrCu4LJB70egYFYnywzB9lMyQ==}
@@ -8161,6 +8167,15 @@ snapshots:
       - vls
       - vti
       - vue-tsc
+
+  '@nuxtjs/robots@3.0.0(rollup@4.18.0)':
+    dependencies:
+      '@nuxt/kit': 3.11.2(rollup@4.18.0)
+      h3: 1.11.1
+    transitivePeerDependencies:
+      - rollup
+      - supports-color
+      - uWebSockets.js
 
   '@nuxtjs/tailwindcss@6.12.0(rollup@4.18.0)':
     dependencies:

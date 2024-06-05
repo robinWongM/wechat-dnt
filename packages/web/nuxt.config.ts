@@ -1,7 +1,7 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
   devtools: { enabled: true },
-  modules: ["@nuxtjs/tailwindcss"],
+  modules: ["@nuxtjs/tailwindcss", "@nuxtjs/robots"],
   build: {
     transpile: ['trpc-nuxt'],
   },
@@ -28,6 +28,12 @@ export default defineNuxtConfig({
     },
     wxa: {
       appId: '',
+    }
+  },
+  robots: {
+    rules: {
+      UserAgent: '*',
+      Disallow: '/',
     }
   }
 })
