@@ -56,9 +56,6 @@ importers:
       querystringify:
         specifier: ^2.2.0
         version: 2.2.0
-      radix3:
-        specifier: ^1.1.2
-        version: 1.1.2
       url-parse:
         specifier: ^1.5.10
         version: 1.5.10

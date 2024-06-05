@@ -30,7 +30,17 @@ export type Sanitizer<
   customSchemeLink?: string;
 };
 
-export type Extractor = () => void;
+export type Extractor<
+  Param extends OptionalObjectSchema,
+  Query extends OptionalObjectSchema
+> = (input: { url: string; param: InferOutput<Param>; query: InferOutput<Query> }, context: {
+  fetch: typeof fetch;
+}) => {
+  title: string;
+  description?: string;
+  metadata?: Record<string, string>;
+  images: string[];
+};
 
 const createRegExpFromPath = (path: string) => {
   const segments = path.split("/");
