@@ -2,7 +2,7 @@ import { Hono } from "hono";
 import { env } from "hono/adapter";
 import { createHash } from "node:crypto";
 import { useEvent } from "./reply";
-import { isShortLink as checkIfShortLink, extractLink, match } from "@dnt/core";
+import { isShortLink as checkIfShortLink, extractLink, sanitize } from "@dnt/core";
 import { fetch } from "ofetch";
 import { generateCard } from "../og";
 
@@ -68,7 +68,7 @@ app.post("/", async (c) => {
         }
       }
 
-      const matchResult = match(link);
+      const matchResult = sanitize(link);
       if (!matchResult) {
         await reply(`${messagePrefix}暂不支持此链接。`);
         return;

@@ -1,6 +1,6 @@
 import { XMLParser } from "fast-xml-parser";
 import { z, object, string, number } from "zod";
-import { extractLink, isShortLink, match } from "@dnt/core";
+import { extractLink, isShortLink, sanitize } from "@dnt/core";
 import og from "open-graph-scraper";
 import { appRouter } from "~/server/trpc/routers";
 import { createCallerFactory } from "@trpc/server";
@@ -84,7 +84,7 @@ const handleMpEvent = async (event: z.infer<typeof eventSchema>) => {
       void mpSendTextMessage(FromUserName, `重定向至：\n${link}`);
     }
 
-    const matchResult = match(link);
+    const matchResult = sanitize(link);
     if (!matchResult) {
       return mpSendTextMessage(FromUserName, "暂不支持此链接。");
     }
