@@ -73,6 +73,6 @@
     "typescript": "^5.4.5",
     "vite": "^5.2.8",
     "vue-tsc": "^1.0.24",
-    "weapp-tailwindcss": "^3.1.1"
+    "weapp-tailwindcss": "^3.3.0"
   }
 }
