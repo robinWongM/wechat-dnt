@@ -6,8 +6,5 @@ export const sanitize = (url: string) => {
     return null;
   }
 
-  return matched.sanitizer({
-    param: matched.param,
-    query: matched.query,
-  });
+  return matched.sanitize();
 }

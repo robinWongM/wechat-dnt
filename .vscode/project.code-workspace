@@ -1,0 +1,17 @@
+{
+  "folders": [
+    {
+      "name": "ROOT",
+      "path": "../"
+    },
+    {
+      "name": "packages/core",
+      "path": "../packages/core"
+    },
+    {
+      "name": "packages/web",
+      "path": "../packages/web"
+    },
+  ],
+  "settings": {}
+}

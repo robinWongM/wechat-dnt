@@ -5,6 +5,7 @@ import {
 } from "valibot";
 import type { Optional } from "utility-types";
 import { char, createRegExp, oneOrMore } from "magic-regexp/further-magic";
+import type { CheerioAPI } from "cheerio";
 
 type OptionalObjectSchema = ObjectSchema<{}> | undefined;
 type InferOutput<T> = T extends ObjectSchema<{}> ? Output<T> : never;
@@ -20,27 +21,32 @@ export type Pattern<
   param: Param;
 };
 
-export type Sanitizer<
-  Param extends OptionalObjectSchema,
-  Query extends OptionalObjectSchema
-> = (input: { param: InferOutput<Param>; query: InferOutput<Query> }) => {
+type SanitizerOutput = {
   fullLink: string;
   shortLink?: string;
   universalLink?: string;
   customSchemeLink?: string;
 };
-
-export type Extractor<
+export type Sanitizer<
   Param extends OptionalObjectSchema,
   Query extends OptionalObjectSchema
-> = (input: { url: string; param: InferOutput<Param>; query: InferOutput<Query> }, context: {
-  fetch: typeof fetch;
-}) => {
+> = (input: { param: InferOutput<Param>; query: InferOutput<Query> }) => SanitizerOutput;
+
+type ExtractMetadata = {
+  label: string;
+  icon: string;
+  value: string;
+}
+type ExtractorOutput = {
   title: string;
   description?: string;
-  metadata?: Record<string, string>;
+  metadata?: ExtractMetadata[];
   images: string[];
 };
+export type Extractor = (input: SanitizerOutput, context: {
+  fetch: typeof fetch;
+  loadHtml: (html: string) => CheerioAPI;
+}) => ExtractorOutput | PromiseLike<ExtractorOutput>;
 
 const createRegExpFromPath = (path: string) => {
   const segments = path.split("/");
@@ -69,6 +75,7 @@ export const defineHandler = <
 >(input: {
   pattern: Optional<Pattern<Param, Query>, "protocol" | "param" | "query">;
   sanitizer: Sanitizer<Param, Query>;
+  extractor?: Extractor;
 }) => {
   const { path } = input.pattern;
   const fullPattern = {
@@ -82,6 +89,7 @@ export const defineHandler = <
   return {
     pattern: fullPattern,
     sanitizer: input.sanitizer,
+    extractor: input.extractor,
   };
 };
 

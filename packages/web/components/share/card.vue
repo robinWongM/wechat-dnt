@@ -1,43 +1,24 @@
 <template>
   <div class="px-4 pt-6 pb-safe-offset-36">
     <div class="flex flex-row gap-2 w-full">
-      <i class="flex-none i-lucide-link w-8 h-8"></i>
+      <i class="flex-none i-lucide-link w-8 h-8" :class="{
+        'i-simple-icons-bilibili': openGraphData?.name === 'bilibili',
+      }"></i>
     </div>
     <div class="mt-6">
-      <img v-if="openGraphData?.ogImage?.[0]" :src="openGraphData.ogImage[0].url" alt=""
-        :width="openGraphData.ogImage[0].width" :height="openGraphData.ogImage[0].height" referrerpolicy="no-referrer"
+      <img v-if="openGraphData?.images?.[0]" :src="openGraphData?.images?.[0]" alt="" referrerpolicy="no-referrer"
         class="w-full mt-4 rounded-2xl" />
-      <h1 class="mt-4 font-semibold text-xl">{{ openGraphData?.ogTitle }}</h1>
-      <div class="flex flex-row mt-4 gap-1 hidden">
-        <div class="flex-1 flex flex-col gap-0.5">
-          <div class="text-xs font-semibold opacity-40">UP 主</div>
-          <div class="text-sm"></div>
-        </div>
-        <div class="flex-1 flex flex-col gap-0.5">
-          <div class="text-xs font-semibold opacity-40">时长</div>
-          <div class="text-sm"></div>
-        </div>
-        <div class="flex-1 flex flex-col gap-0.5">
-          <div class="text-xs font-semibold opacity-40">发布时间</div>
-          <div class="text-sm"></div>
-        </div>
-        <div class="flex-1 flex flex-col gap-0.5">
-          <div class="inline-flex text-xs font-semibold opacity-40 items-center gap-1">
-            <i class="i-lucide-play w-3 h-3"></i>
-            <span>/</span>
-            <i class="i-lucide-text w-3 h-3"></i>
-          </div>
-          <div class="text-sm">
-            0
-            <span class="opacity-40">/</span>
-            0
-          </div>
+      <h1 class="mt-4 font-semibold text-xl">{{ openGraphData?.title }}</h1>
+      <div class="flex flex-row mt-4 gap-1" v-if="openGraphData?.metadata">
+        <div class="flex-1 flex flex-col gap-0.5" v-for="metadata in openGraphData.metadata">
+          <div class="text-xs font-semibold opacity-40">{{ metadata.label }}</div>
+          <div class="text-sm">{{ metadata.value }}</div>
         </div>
       </div>
-      <div v-if="openGraphData?.ogDescription" class="mt-4 rounded-2xl overflow-hidden bg-[#f7f7f7] dark:bg-white dark:bg-opacity-5">
+      <div v-if="openGraphData?.description" class="mt-4 rounded-2xl overflow-hidden bg-[#f7f7f7] dark:bg-white dark:bg-opacity-5">
         <div class="px-4 pt-3 pb-4">
           <div class="mt-1 opacity-90 text-sm">
-            {{ openGraphData?.ogDescription }}
+            {{ openGraphData?.description }}
           </div>
         </div>
       </div>
@@ -110,10 +91,10 @@ onMounted(async () => {
       openTagList: [],
     });
     await updateAppMessageShareData({
-      title: openGraphData.value?.ogTitle,
-      desc: openGraphData.value?.ogDescription,
+      title: openGraphData.value?.title || '',
+      desc: openGraphData.value?.description || '',
       link: location.href,
-      imgUrl: openGraphData.value?.ogImage?.[0]?.url,
+      imgUrl: openGraphData.value?.images?.[0] || '',
     });
   }
 });

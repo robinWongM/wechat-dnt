@@ -48,11 +48,24 @@ export const match = (url: string) => {
         continue;
       }
 
-      return {
-        config,
-        sanitizer: handler.sanitizer,
+      const sanitize = () => handler.sanitizer({
         param: validatedParam.output,
         query: validatedQuery.output,
+      });
+      const extract = (context: Parameters<Exclude<typeof handler.extractor, undefined>>[1] ) => {
+        if (!handler.extractor) {
+          return null;
+        }
+
+        const sanitized = sanitize();
+        return handler.extractor(sanitized, context);
+      }
+
+      return {
+        config,
+        handler,
+        sanitize,
+        extract,
       };
     }
   }

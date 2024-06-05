@@ -1,7 +1,6 @@
 import { XMLParser } from "fast-xml-parser";
 import { z, object, string, number } from "zod";
 import { extractLink, isShortLink, sanitize } from "@dnt/core";
-import og from "open-graph-scraper";
 import { appRouter } from "~/server/trpc/routers";
 import { createCallerFactory } from "@trpc/server";
 

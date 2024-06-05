@@ -11,6 +11,15 @@ import {
 } from "valibot";
 import { stringify } from "querystringify";
 import { defineHandler, defineRouter } from "../utils/router";
+import dayjs from "dayjs";
+import dayjsDuration from "dayjs/plugin/duration";
+import dayjsRelativeTime from "dayjs/plugin/relativeTime";
+import "dayjs/locale/zh-cn";
+import { parseModule } from "esprima";
+
+dayjs.locale('zh-cn');
+dayjs.extend(dayjsDuration);
+dayjs.extend(dayjsRelativeTime);
 
 const XOR_CODE = 23442827791579n;
 const MASK_CODE = 2251799813685247n;
@@ -95,6 +104,63 @@ export default defineRouter(
       }),
     },
     sanitizer: ({ param: { videoId }, query }) => getVideoLink(videoId, query),
+    extractor: async ({ fullLink }, { fetch, loadHtml }) => {
+      const resp = await fetch(fullLink);
+      const html = await resp.text();
+      const $ = loadHtml(html);
+
+      const initialScript = $("script")
+        .toArray()
+        .find((el) => {
+          const scriptContent = $(el).text();
+          return scriptContent.startsWith("window.__INITIAL_STATE__=");
+        });
+      if (!initialScript) {
+        throw new Error("Failed to find initial script");
+      }
+
+      const initialData = $(initialScript)
+        .text()
+        .replace(/^window\.__INITIAL_STATE__=/, "export default ");
+      const module = parseModule(initialData, { range: true });
+      const objectRange =
+        module.body[0].type === "ExportDefaultDeclaration" &&
+        module.body[0].declaration.type === "ObjectExpression" &&
+        module.body[0].declaration.range;
+      if (!objectRange) {
+        throw new Error("Failed to find initial script");
+      }
+
+      const { videoData } = JSON.parse(initialData.slice(objectRange[0], objectRange[1]));
+
+      const {
+        title,
+        desc,
+        pic,
+        ctime,
+        duration,
+        owner: { name, face },
+        stat: { view, danmaku, like },
+      } = videoData;
+
+      return {
+        title,
+        description: desc,
+        images: [pic],
+        metadata: [
+          { label: "UP 主", icon: "", value: name },
+          {
+            label: "时长",
+            icon: "",
+            value: dayjs
+              .duration(parseInt(duration, 10), "seconds")
+              .format("mm:ss"),
+          },
+          { label: "播放量", icon: "", value: view },
+          { label: "发布时间", icon: "", value: dayjs(ctime * 1000).locale('zh-cn').toNow() },
+        ],
+      };
+    },
   }),
 
   defineHandler({
