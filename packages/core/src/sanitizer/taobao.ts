@@ -1,4 +1,4 @@
-import { m } from "./constructor";
+import { defineHandler, defineRouter } from "../utils/router";
 import { object, coerce, number } from "valibot";
 
 const taobaoLink = (id: number) => ({
@@ -7,22 +7,30 @@ const taobaoLink = (id: number) => ({
   customSchemeLink: `tbopen://m.taobao.com/tbopen/index.html?id=${id}`,
 });
 
-export default [
-  m("item.taobao.com")
-    .path("/item.htm")
-    .input({
-      query: object({
-        id: coerce(number(), Number),
-      }),
-    })
-    .output(({ query: { id } }) => taobaoLink(id)),
+export default defineRouter(
+  {
+    name: "taobao",
+  },
 
-  m("main.m.taobao.com")
-    .path("/security-h5-detail/home")
-    .input({
+  defineHandler({
+    pattern: {
+      host: ["item.taobao.com"],
+      path: "/item.htm",
       query: object({
         id: coerce(number(), Number),
       }),
-    })
-    .output(({ query: { id } }) => taobaoLink(id)),
-];
+    },
+    sanitizer: ({ query: { id } }) => taobaoLink(id),
+  }),
+
+  defineHandler({
+    pattern: {
+      host: ["main.m.taobao.com"],
+      path: "/security-h5-detail/home",
+      query: object({
+        id: coerce(number(), Number),
+      }),
+    },
+    sanitizer: ({ query: { id } }) => taobaoLink(id),
+  })
+);

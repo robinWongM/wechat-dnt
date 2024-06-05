@@ -1,4 +1,3 @@
-import { m } from "./constructor";
 import {
   object,
   string,
@@ -11,6 +10,7 @@ import {
   transform,
 } from "valibot";
 import { stringify } from "querystringify";
+import { defineHandler, defineRouter } from "../utils/router";
 
 const XOR_CODE = 23442827791579n;
 const MASK_CODE = 2251799813685247n;
@@ -34,6 +34,29 @@ function bv2av(bvid: string) {
   return Number((tmp & MASK_CODE) ^ XOR_CODE);
 }
 
+function getVideoLink(bvId: string, query: { t?: number; p?: number }) {
+  const timeQuery = stringify(query, true);
+  const fullLink = `https://www.bilibili.com/video/${bvId}${timeQuery}`;
+  const shortLink = `https://b23.tv/${bvId}${timeQuery}`;
+  const universalLink = `https://www.bilibili.com/video/${bvId}`;
+
+  const mobileQuery = stringify(
+    {
+      ...(query.t ? { start_progress: query.t * 1000 } : {}),
+      ...(query.p ? { page: query.p - 1 } : {}),
+    },
+    true
+  );
+  const customSchemeLink = `bilibili://video/${bv2av(bvId)}${mobileQuery}`;
+
+  return {
+    fullLink,
+    shortLink,
+    universalLink,
+    customSchemeLink,
+  };
+}
+
 function getDynamicLink(dynamicId: string) {
   return {
     fullLink: `https://www.bilibili.com/opus/${dynamicId}`,
@@ -50,11 +73,17 @@ function getReadLink(cvId: number) {
   };
 }
 
-export default [
-  m("www.bilibili.com", "m.bilibili.com")
-    .path("/video/:videoId")
-    .input({
-      params: object({
+// Rewrite into new format
+export default defineRouter(
+  {
+    name: "bilibili",
+  },
+
+  defineHandler({
+    pattern: {
+      host: ["www.bilibili.com", "m.bilibili.com"],
+      path: "/video/:videoId",
+      param: object({
         videoId: union([
           string([startsWith("BV")]),
           string([startsWith("av")]),
@@ -64,74 +93,80 @@ export default [
         t: optional(coerce(number(), Number)),
         p: optional(coerce(number(), Number)),
       }),
-    })
-    .output(({ params: { videoId }, query }) => {
-      const timeQuery = stringify(query, true);
-      const fullLink = `https://www.bilibili.com/video/${videoId}${timeQuery}`;
-      const shortLink = `https://b23.tv/${videoId}${timeQuery}`;
-      const universalLink = `https://www.bilibili.com/video/${videoId}`;
+    },
+    sanitizer: ({ param: { videoId }, query }) => getVideoLink(videoId, query),
+  }),
 
-      const mobileQuery = stringify(
-        {
-          ...(query.t ? { start_progress: query.t * 1000 } : {}),
-          ...(query.p ? { page: query.p - 1 } : {}),
-        },
-        true
-      );
-      const customSchemeLink = `bilibili://video/${bv2av(
-        videoId
-      )}${mobileQuery}`;
+  defineHandler({
+    pattern: {
+      host: ["www.bilibili.com", "m.bilibili.com"],
+      path: "/opus/:opusId",
+      param: object({ opusId: string() }),
+    },
+    sanitizer: ({ param: { opusId } }) => getDynamicLink(opusId),
+  }),
 
-      return {
-        fullLink,
-        shortLink,
-        universalLink,
-        customSchemeLink,
-      };
-    }),
+  defineHandler({
+    pattern: {
+      host: ["t.bilibili.com"],
+      path: "/:dynamicId",
+      param: object({ dynamicId: string() }),
+    },
+    sanitizer: ({ param: { dynamicId } }) => getDynamicLink(dynamicId),
+  }),
 
-  m("www.bilibili.com", "m.bilibili.com")
-    .path("/opus/:opusId")
-    .output(({ params: { opusId } }) => getDynamicLink(opusId)),
+  defineHandler({
+    pattern: {
+      host: ["m.bilibili.com"],
+      path: "/dynamic/:dynamicId",
+      param: object({ dynamicId: string() }),
+    },
+    sanitizer: ({ param: { dynamicId } }) => getDynamicLink(dynamicId),
+  }),
 
-  m("t.bilibili.com")
-    .path("/:dynamicId")
-    .output(({ params: { dynamicId } }) => getDynamicLink(dynamicId)),
-
-  m("m.bilibili.com")
-    .path("/dynamic/:dynamicId")
-    .output(({ params: { dynamicId } }) => getDynamicLink(dynamicId)),
-
-  m("live.bilibili.com")
-    .path("/:roomId")
-    .input({ params: object({ roomId: coerce(number(), Number) }) })
-    .output(({ params: { roomId } }) => ({
+  defineHandler({
+    pattern: {
+      host: ["live.bilibili.com"],
+      path: "/:roomId",
+      param: object({ roomId: coerce(number(), Number) }),
+    },
+    sanitizer: ({ param: { roomId } }) => ({
       fullLink: `https://live.bilibili.com/${roomId}`,
       universalLink: `https://live.bilibili.com/${roomId}`,
       customSchemeLink: `bilibili://live/${roomId}`,
-    })),
+    }),
+  }),
 
-  m("www.bilibili.com", "bilibili.com")
-    .path("/read/:cvId")
-    .input({
-      params: object({
-        cvId: transform(string([regex(/^cv\d+$/)]), (str) => parseInt(str.slice(2), 10))
+  defineHandler({
+    pattern: {
+      host: ["www.bilibili.com", "bilibili.com"],
+      path: "/read/:cvId",
+      param: object({
+        cvId: transform(string([regex(/^cv\d+$/)]), (str) =>
+          parseInt(str.slice(2), 10)
+        ),
       }),
-    })
-    .output(({ params: { cvId } }) => getReadLink(cvId)),
+    },
+    sanitizer: ({ param: { cvId } }) => getReadLink(cvId),
+  }),
 
-  m("www.bilibili.com", "bilibili.com")
-    .path("/read/mobile/:cvId")
-    .input({
-      params: object({ cvId: coerce(number(), Number), }),
-    })
-    .output(({ params: { cvId } }) => getReadLink(cvId)),
+  defineHandler({
+    pattern: {
+      host: ["www.bilibili.com", "bilibili.com"],
+      path: "/read/mobile/:cvId",
+      param: object({ cvId: coerce(number(), Number) }),
+    },
+    sanitizer: ({ param: { cvId } }) => getReadLink(cvId),
+  }),
 
-  m("www.bilibili.com", "bilibili.com")
-    .path("/read/mobile")
-    .input({
-      query: object({ id: coerce(number(), Number), }),
-    })
-    .output(({ query: { id } }) => getReadLink(id)),
-
-];
+  defineHandler({
+    pattern: {
+      host: ["www.bilibili.com", "bilibili.com"],
+      path: "/read/mobile",
+      query: object({
+        id: coerce(number(), Number),
+      }),
+    },
+    sanitizer: ({ query: { id } }) => getReadLink(id),
+  })
+);

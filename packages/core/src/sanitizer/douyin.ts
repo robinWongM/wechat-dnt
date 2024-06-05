@@ -1,4 +1,5 @@
-import { m } from "./constructor";
+import { object, string } from "valibot";
+import { defineHandler, defineRouter } from "../utils/router";
 
 const douyinLink = (videoId: string) => ({
   fullLink: `https://www.douyin.com/video/${videoId}`,
@@ -6,12 +7,26 @@ const douyinLink = (videoId: string) => ({
   universalLink: `https://www.douyin.com/video/${videoId}`,
 });
 
-export default [
-  m("www.douyin.com", "douyin.com")
-    .path("/video/:videoId")
-    .output(({ params: { videoId } }) => douyinLink(videoId)),
+export default defineRouter(
+  {
+    name: "douyin",
+  },
 
-  m("www.iesdouyin.com", "iesdouyin.com")
-    .path("/share/video/:videoId")
-    .output(({ params: { videoId } }) => douyinLink(videoId)),
-];
+  defineHandler({
+    pattern: {
+      host: ["www.douyin.com", "douyin.com"],
+      path: "/video/:videoId",
+      param: object({ videoId: string() }),
+    },
+    sanitizer: ({ param: { videoId } }) => douyinLink(videoId),
+  }),
+
+  defineHandler({
+    pattern: {
+      host: ["www.iesdouyin.com", "iesdouyin.com"],
+      path: "/share/video/:videoId",
+      param: object({ videoId: string() }),
+    },
+    sanitizer: ({ param: { videoId } }) => douyinLink(videoId),
+  })
+);

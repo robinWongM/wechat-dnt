@@ -1,27 +1,38 @@
 import { object, string } from "valibot";
-import { m } from "./constructor";
-import { stringify } from 'querystringify';
+import { stringify } from "querystringify";
+import { defineHandler, defineRouter } from "../utils/router";
 
-export default [
-  m("mp.weixin.qq.com")
-    .path("/s")
-    .input({
+export default defineRouter(
+  {
+    name: "wechat",
+  },
+
+  defineHandler({
+    pattern: {
+      host: ["mp.weixin.qq.com"],
+      path: "/s",
       query: object({
         __biz: string(),
         mid: string(),
         idx: string(),
         sn: string(),
       }),
-    })
-    .output(({ query }) => {
+    },
+    sanitizer: ({ query }) => {
       return {
         fullLink: `https://mp.weixin.qq.com/s?${stringify(query)}`,
-      }
-    }),
+      };
+    },
+  }),
 
-  m("mp.weixin.qq.com")
-    .path("/s/:articleId")
-    .output(({ params: { articleId } }) => ({
+  defineHandler({
+    pattern: {
+      host: ["mp.weixin.qq.com"],
+      path: "/s/:articleId",
+      param: object({ articleId: string() }),
+    },
+    sanitizer: ({ param: { articleId } }) => ({
       fullLink: `https://mp.weixin.qq.com/s/${articleId}`,
-    })),
-]
+    }),
+  })
+);
