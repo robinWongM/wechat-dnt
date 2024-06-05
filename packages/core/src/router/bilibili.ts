@@ -14,10 +14,9 @@ import { defineHandler, defineRouter } from "../utils/router";
 import dayjs from "dayjs";
 import dayjsDuration from "dayjs/plugin/duration.js";
 import dayjsRelativeTime from "dayjs/plugin/relativeTime.js";
-import "dayjs/locale/zh-cn";
+import "dayjs/locale/zh-cn.js";
 import { parseModule } from "esprima";
 
-dayjs.locale('zh-cn');
 dayjs.extend(dayjsDuration);
 dayjs.extend(dayjsRelativeTime);
 
@@ -157,7 +156,7 @@ export default defineRouter(
               .format("mm:ss"),
           },
           { label: "播放量", icon: "", value: view },
-          { label: "发布时间", icon: "", value: dayjs(ctime * 1000).locale('zh-cn').toNow() },
+          { label: "发布时间", icon: "", value: dayjs(ctime * 1000).locale('zh-cn').fromNow() },
         ],
       };
     },
