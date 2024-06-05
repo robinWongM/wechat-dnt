@@ -1,2 +1,0 @@
-#!/bin/bash
-/var/lang/node18/bin/node dist/main.js
