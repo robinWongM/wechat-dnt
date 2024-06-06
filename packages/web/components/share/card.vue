@@ -27,7 +27,7 @@
     </div>
   </div>
   <div
-    class="px-4 pt-4 pb-safe-or-4 dark:bg-[#111] dark:bg-opacity-60 backdrop-blur-2xl"
+    class="fixed bottom-0 left-0 right-0 px-4 pt-4 pb-safe-or-4 dark:bg-[#111] dark:bg-opacity-60 backdrop-blur-2xl"
     v-if="data">
     <a class="flex-1 flex flex-row items-center gap-4 rounded-2xl text-white bg-black dark:bg-white bg-opacity-90 dark:bg-opacity-90 dark:text-black px-6 py-4 active:bg-opacity-80 transition-colors cursor-pointer"
       @click="openPreview">
