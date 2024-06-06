@@ -25,38 +25,40 @@
         <span class="inline align-middle break-all">{{ data?.fullLink }}</span>
       </div>
     </div>
+    <div class="pb-safe h-48"></div>
   </div>
-  <div
-    class="fixed bottom-0 left-0 right-0 px-4 pt-4 pb-safe-or-4 dark:bg-[#111] dark:bg-opacity-60 backdrop-blur-2xl"
+  <div class="fixed bottom-0 left-0 right-0 px-4 pt-4 pb-safe-or-4 dark:bg-[#111] dark:bg-opacity-60 backdrop-blur-2xl"
     v-if="data">
-    <a class="flex-1 flex flex-row items-center gap-4 rounded-2xl text-white bg-black dark:bg-white bg-opacity-90 dark:bg-opacity-90 dark:text-black px-6 py-4 active:bg-opacity-80 transition-colors cursor-pointer"
-      @click="openPreview">
-      <i class=" i-lucide-lollipop w-6 h-6"></i>
-      <div class="flex flex-col items-start flex-1">
-        <span class="text-base">无痕预览原网页</span>
-        <span class="text-xs opacity-60 line-clamp-1">在支持的浏览器中屏蔽原网站的 Cookies</span>
+    <div class="max-w-xl mx-auto">
+      <a class="flex-1 flex flex-row items-center gap-4 rounded-2xl text-white bg-black dark:bg-white bg-opacity-90 dark:bg-opacity-90 dark:text-black px-6 py-4 active:bg-opacity-80 transition-colors cursor-pointer"
+        @click="openPreview">
+        <i class=" i-lucide-lollipop w-6 h-6"></i>
+        <div class="flex flex-col items-start flex-1">
+          <span class="text-base">无痕预览原网页</span>
+          <span class="text-xs opacity-60 line-clamp-1">在支持的浏览器中屏蔽原网站的 Cookies</span>
+        </div>
+      </a>
+      <ClientOnly>
+        <SharePreview :url="data.fullLink" v-model="isPreviewVisible" />
+      </ClientOnly>
+      <div class="flex flex-row gap-4 mt-4">
+        <a class="border flex-1 flex flex-row items-center gap-2 rounded-2xl p-4 active:bg-opacity-20 transition-colors cursor-pointer"
+          @click="copyFullLink">
+          <i class="i-lucide-copy w-4 h-4"></i>
+          <div class="flex flex-col items-end flex-1 text-right">
+            <span class="text-base">复制链接</span>
+            <span class="text-xs opacity-40 line-clamp-1">已去除跟踪参数</span>
+          </div>
+        </a>
+        <a class="border flex-1 flex flex-row items-center gap-2 rounded-2xl p-4 active:bg-opacity-20 transition-colors"
+          :href="data?.fullLink" referrerpolicy="no-referrer">
+          <i class="i-lucide-arrow-right w-4 h-4"></i>
+          <div class="flex flex-col items-end flex-1 text-right">
+            <span class="text-base">直接打开</span>
+            <span class="text-xs opacity-40 line-clamp-1">使用微信内置浏览器</span>
+          </div>
+        </a>
       </div>
-    </a>
-    <ClientOnly>
-      <SharePreview :url="data.fullLink" v-model="isPreviewVisible" />
-    </ClientOnly>
-    <div class="flex flex-row gap-4 mt-4">
-      <a class="border flex-1 flex flex-row items-center gap-2 rounded-2xl p-4 active:bg-opacity-20 transition-colors cursor-pointer"
-        @click="copyFullLink">
-        <i class="i-lucide-copy w-4 h-4"></i>
-        <div class="flex flex-col items-end flex-1 text-right">
-          <span class="text-base">复制链接</span>
-          <span class="text-xs opacity-40 line-clamp-1">已去除跟踪参数</span>
-        </div>
-      </a>
-      <a class="border flex-1 flex flex-row items-center gap-2 rounded-2xl p-4 active:bg-opacity-20 transition-colors"
-        :href="data?.fullLink" referrerpolicy="no-referrer">
-        <i class="i-lucide-arrow-right w-4 h-4"></i>
-        <div class="flex flex-col items-end flex-1 text-right">
-          <span class="text-base">直接打开</span>
-          <span class="text-xs opacity-40 line-clamp-1">使用微信内置浏览器</span>
-        </div>
-      </a>
     </div>
   </div>
   <Toaster position="bottom-center" :theme="theme" />
