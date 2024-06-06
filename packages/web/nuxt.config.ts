@@ -3,7 +3,7 @@ export default defineNuxtConfig({
   devtools: { enabled: true },
   modules: ["@nuxtjs/tailwindcss", "@nuxtjs/robots"],
   build: {
-    transpile: ['trpc-nuxt'],
+    transpile: ['trpc-nuxt', 'vue-sonner'],
   },
   nitro: {
     esbuild: {
