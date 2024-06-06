@@ -1,5 +1,21 @@
 import { object, string } from "valibot";
-import { defineHandler, defineRouter } from "../utils/router";
+import { Extractor, defineHandler, defineRouter } from "../utils/router";
+
+const extractor: Extractor = async ({ fullLink }, { fetch, loadHtml }) => {
+  const resp = await fetch(fullLink);
+  const html = await resp.text();
+  const $ = loadHtml(html);
+
+  const title = $("#detail-title").text();
+  const description = $("#detail-desc").find("br").replaceWith("\n").end().text();
+  const image = $("meta[name='og:image']").attr("content");
+
+  return {
+    title,
+    description,
+    images: image ? [image] : [],
+  };
+};
 
 export default defineRouter(
   {
@@ -18,6 +34,7 @@ export default defineRouter(
       universalLink: `https://www.xiaohongshu.com/discovery/item/${itemId}`,
       customSchemeLink: `xhsdiscover://item/${itemId}`,
     }),
+    extractor,
   }),
 
   defineHandler({
@@ -31,6 +48,7 @@ export default defineRouter(
       universalLink: `https://www.xiaohongshu.com/explore/${itemId}`,
       customSchemeLink: `xhsdiscover://item/${itemId}`,
     }),
+    extractor,
   }),
 
   defineHandler({
