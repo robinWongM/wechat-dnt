@@ -11,7 +11,7 @@
         <img :src="openGraphData?.images?.[0]" alt="" referrerpolicy="no-referrer"
           class="absolute top-0 left-0 w-full h-full -z-10 object-fill scale-125 blur-3xl" />
       </div>
-      <div class="p-4 flex flex-col gap-4">
+      <div class="p-4 flex flex-col gap-2">
         <h1 class="font-semibold text-xl">{{ openGraphData?.title }}</h1>
         <div v-if="openGraphData?.description">
           <div class="">
