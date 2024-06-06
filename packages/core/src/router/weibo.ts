@@ -3,7 +3,8 @@ import { defineHandler, defineRouter } from "../utils/router";
 
 export default defineRouter(
   {
-    name: "weibo",
+    id: "weibo",
+    name: "微博",
   },
 
   defineHandler({

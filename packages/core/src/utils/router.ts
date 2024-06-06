@@ -71,6 +71,30 @@ const createRegExpFromPath = (path: string) => {
   return createRegExp(...regExpPart);
 };
 
+const defaultExtractor: Extractor = async (
+  { fullLink },
+  { fetch, loadHtml }
+) => {
+  const resp = await fetch(fullLink);
+  const html = await resp.text();
+  const $ = loadHtml(html);
+
+  const title =
+    $("meta[property='og:title']").attr("content") ||
+    $("meta[name='og:title']").attr("content") ||
+    $("title").text();
+  const description =
+    $("meta[property='og:description']").attr("content") ||
+    $("meta[name='og:description']").attr("content") ||
+    $("meta[name='description']").attr("content") ||
+    "";
+  const ogImage =
+    $("meta[property='og:image']").attr("content") ||
+    $("meta[name='og:image']").attr("content");
+
+  return { title, description, images: ogImage ? [ogImage] : [] };
+};
+
 export const defineHandler = <
   Param extends OptionalObjectSchema = undefined,
   Query extends OptionalObjectSchema = undefined
@@ -91,13 +115,13 @@ export const defineHandler = <
   return {
     pattern: fullPattern,
     sanitizer: input.sanitizer,
-    extractor: input.extractor,
+    extractor: input.extractor ?? defaultExtractor,
   };
 };
 
 export type Handler = ReturnType<typeof defineHandler>;
 export const defineRouter = (
-  config: { name: string; icon?: string },
+  config: { id: string; name: string; icon?: string },
   ...handlers: Handler[]
 ) => {
   return { config, handlers };

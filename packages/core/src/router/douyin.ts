@@ -9,7 +9,8 @@ const douyinLink = (videoId: string) => ({
 
 export default defineRouter(
   {
-    name: "douyin",
+    id: "douyin",
+    name: "抖音",
   },
 
   defineHandler({

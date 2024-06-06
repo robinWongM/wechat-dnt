@@ -4,7 +4,8 @@ import { defineHandler, defineRouter } from "../utils/router";
 
 export default defineRouter(
   {
-    name: "wechat",
+    id: "wechat",
+    name: "微信公众平台",
   },
 
   defineHandler({

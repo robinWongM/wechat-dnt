@@ -84,8 +84,8 @@ function getReadLink(cvId: number) {
 // Rewrite into new format
 export default defineRouter(
   {
-    name: "BiliBili",
-    icon: 'i-simple-icons-bilibili',
+    id: "bilibili",
+    name: '哔哩哔哩',
   },
 
   defineHandler({

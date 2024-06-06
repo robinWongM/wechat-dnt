@@ -1,7 +1,7 @@
 <template>
-  <div class="px-4 pt-6 pb-safe-offset-36 max-w-xl mx-auto">
+  <div class="px-4 pt-6 pb-safe-offset-36 max-w-xl mx-auto" v-if="openGraphData">
     <div class="flex flex-row gap-2 w-full">
-      <i class="flex-none i-lucide-link w-8 h-8" :class="openGraphData?.config.icon"></i>
+      <ShareLogo :name="openGraphData.config.id" />
     </div>
     <div class="mt-6">
       <img v-if="openGraphData?.images?.[0]" :src="openGraphData?.images?.[0]" alt="" referrerpolicy="no-referrer"

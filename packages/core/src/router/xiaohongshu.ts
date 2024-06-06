@@ -3,7 +3,8 @@ import { defineHandler, defineRouter } from "../utils/router";
 
 export default defineRouter(
   {
-    name: "xiaohongshu",
+    id: "xiaohongshu",
+    name: "小红书",
   },
 
   defineHandler({

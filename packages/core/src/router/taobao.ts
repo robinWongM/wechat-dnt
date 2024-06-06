@@ -9,7 +9,8 @@ const taobaoLink = (id: number) => ({
 
 export default defineRouter(
   {
-    name: "taobao",
+    id: "taobao",
+    name: "淘宝",
   },
 
   defineHandler({
