@@ -42,7 +42,7 @@
         <SharePreview :url="data.iframeLink ?? data.fullLink" v-model="isPreviewVisible" />
       </ClientOnly>
       <div class="flex flex-row gap-4 mt-4">
-        <a class="border flex-1 flex flex-row items-center gap-2 rounded-2xl p-4 active:bg-opacity-20 transition-colors cursor-pointer"
+        <a class="border flex-1 flex flex-row bg-background items-center gap-2 rounded-2xl p-4 active:bg-opacity-20 transition-colors cursor-pointer"
           @click="copyFullLink">
           <i class="i-lucide-copy w-4 h-4"></i>
           <div class="flex flex-col items-end flex-1 text-right">
@@ -50,7 +50,7 @@
             <span class="text-xs opacity-40 line-clamp-1">已去除跟踪参数</span>
           </div>
         </a>
-        <a class="border flex-1 flex flex-row items-center gap-2 rounded-2xl p-4 active:bg-opacity-20 transition-colors"
+        <a class="border flex-1 flex flex-row bg-background items-center gap-2 rounded-2xl p-4 active:bg-opacity-20 transition-colors"
           :href="data?.fullLink" referrerpolicy="no-referrer">
           <i class="i-lucide-arrow-right w-4 h-4"></i>
           <div class="flex flex-col items-end flex-1 text-right">
