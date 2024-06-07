@@ -61,7 +61,7 @@ const clearClipboard = () => {
     <DrawerContent class="w-full drawer-content">
       <DrawerHeader>
         <div class="flex flex-row gap-4 items-center">
-          <div class="text-xs flex-1 text-left">部分网站在用户点击时会静默复制内容至剪切板，并在你下次打开 App 读取。为了防止被跟踪，你可以使用右边的按钮清空剪贴板。</div>
+          <div class="text-xs flex-1 text-left">部分网站在用户点击时会静默复制内容至剪切板，并在你下次打开 App 时读取。为了防止被跟踪，你可以使用右边的按钮清空剪贴板。</div>
           <Button class="flex-none" variant="secondary" size="sm" @click="clearClipboard">清空剪切板</Button>
         </div>
       </DrawerHeader>

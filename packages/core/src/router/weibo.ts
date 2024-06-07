@@ -55,19 +55,26 @@ export default defineRouter(
       const renderData = JSON.parse(code)[0];
 
       const title = `@${renderData.status.user.screen_name} 的微博`;
-      const textContent = loadHtml(renderData.status.text)
+      const description = loadHtml(renderData.status.text)
         .root()
         .find("br")
         .replaceWith("\n")
         .end()
         .text();
-      const imageContent = renderData.status.pic_ids.map(() => '[图片]').join(' ');
-      const description = [textContent, imageContent].filter(Boolean).join("\n");
+
+      const images = [];
+      if (renderData.status.pics) {
+        for (const pic of renderData.status.pics) {
+          const proxyUrl = new URL(useRuntimeConfig().web.proxyUrl);
+          proxyUrl.searchParams.set("url", pic.large.url);
+          images.push(proxyUrl.toString());
+        }
+      }
 
       return {
         title,
         description,
-        images: [],
+        images,
       };
     },
   }),

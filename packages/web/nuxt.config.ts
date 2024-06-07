@@ -15,6 +15,7 @@ export default defineNuxtConfig({
   runtimeConfig: {
     web: {
       baseUrl: "",
+      proxyUrl: "",
     },
     mp: {
       token: "",
