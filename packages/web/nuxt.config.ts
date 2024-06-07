@@ -1,39 +1,39 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
   devtools: { enabled: true },
-  modules: ["@nuxtjs/tailwindcss", "@nuxtjs/robots"],
+  modules: ["@nuxtjs/tailwindcss", "@nuxtjs/robots", "@nuxtjs/device"],
   build: {
-    transpile: ['trpc-nuxt', 'vue-sonner'],
+    transpile: ["trpc-nuxt", "vue-sonner"],
   },
   nitro: {
     esbuild: {
       options: {
-        target: 'esnext'
-      }
-    }
+        target: "esnext",
+      },
+    },
   },
   runtimeConfig: {
     web: {
-      baseUrl: '',
+      baseUrl: "",
     },
     mp: {
-      token: '',
-      aesKey: '',
-      appId: '',
-      appSecret: '',
+      token: "",
+      aesKey: "",
+      appId: "",
+      appSecret: "",
     },
     qy: {
-      corpId: '',
-      corpSecret: '',
+      corpId: "",
+      corpSecret: "",
     },
     wxa: {
-      appId: '',
-    }
+      appId: "",
+    },
   },
   robots: {
     rules: {
-      UserAgent: '*',
-      Disallow: '/',
-    }
-  }
-})
+      UserAgent: "*",
+      Disallow: "/",
+    },
+  },
+});

@@ -55,7 +55,8 @@
           <i class="i-lucide-arrow-right w-4 h-4"></i>
           <div class="flex flex-col items-end flex-1 text-right">
             <span class="text-base">直接打开</span>
-            <span class="text-xs opacity-40 line-clamp-1">使用微信内置浏览器</span>
+            <span v-if="isWeChatBrowser" class="text-xs opacity-40 line-clamp-1">使用微信内置浏览器</span>
+            <span v-else class="text-xs opacity-40 line-clamp-1">使用当前浏览器</span>
           </div>
         </a>
       </div>
@@ -76,7 +77,6 @@ const { $client, $toast } = useNuxtApp()
 const { data } = await $client.sanitize.useQuery({
   text: props.url,
 });
-
 const { data: openGraphData } = await $client.scrape.useQuery({
   url: data.value?.fullLink,
 });
@@ -98,6 +98,7 @@ const copyFullLink = () => {
     });
 }
 
+const { userAgent } = useDevice();
 const isMajorAbove = (version: string | undefined, target: number) => {
   if (!version) {
     return false;
@@ -106,13 +107,12 @@ const isMajorAbove = (version: string | undefined, target: number) => {
   const [major] = version.split('.');
   return Number(major) >= target;
 };
-
 const checkIsBrowserSupportsPreview = () => {
   if (import.meta.server) {
     return false;
   }
 
-  const { browser, os, engine } = UAParser(navigator.userAgent);
+  const { browser, os, engine } = UAParser(userAgent);
 
   if (browser.name === 'Safari' || browser.name === 'Mobile Safari') {
     return isMajorAbove(os.version, 14);
@@ -139,7 +139,9 @@ const openPreview = () => {
       duration: 2000,
     });
   }
-}
+};
+
+const isWeChatBrowser = userAgent.toLowerCase().includes('micromessenger');
 
 onMounted(async () => {
   if (import.meta.client) {

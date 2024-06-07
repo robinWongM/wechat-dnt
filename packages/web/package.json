@@ -36,6 +36,7 @@
     "@egoist/tailwindcss-icons": "^1.7.4",
     "@iconify-json/lucide": "^1.1.183",
     "@iconify-json/simple-icons": "^1.1.102",
+    "@nuxtjs/device": "^3.1.1",
     "@nuxtjs/tailwindcss": "^6.12.0",
     "@types/semver": "^7.5.8",
     "@types/ua-parser-js": "^0.7.39",
