@@ -30,6 +30,9 @@ export default defineNuxtConfig({
     wxa: {
       appId: "",
     },
+    public: {
+      defaultShareImageUrl: "",
+    },
   },
   robots: {
     rules: {

@@ -143,6 +143,7 @@ const openPreview = () => {
 
 const isWeChatBrowser = userAgent.toLowerCase().includes('micromessenger');
 
+const { defaultShareImageUrl } = useRuntimeConfig().public;
 onMounted(async () => {
   if (import.meta.client) {
     const { config, updateAppMessageShareData } = useWxSdk();
@@ -167,7 +168,7 @@ onMounted(async () => {
       title: openGraphData.value?.title || '',
       desc: description,
       link: location.href,
-      imgUrl: openGraphData.value?.images?.[0] || '',
+      imgUrl: openGraphData.value?.images?.[0] || defaultShareImageUrl,
     });
   }
 });
