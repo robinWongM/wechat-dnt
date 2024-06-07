@@ -10,6 +10,7 @@ const props = defineProps<{
 const iconClassMapping: Record<string, string | undefined> = {
   'bilibili': 'i-simple-icons-bilibili',
   'xiaohongshu': 'i-simple-icons-xiaohongshu',
+  'weibo': 'i-simple-icons-sinaweibo',
 }
 
 const iconClass = computed(() => iconClassMapping[props.name] ?? 'i-lucide-link');

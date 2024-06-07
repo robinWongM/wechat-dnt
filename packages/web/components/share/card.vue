@@ -15,7 +15,7 @@
         <h1 class="font-semibold text-xl">{{ openGraphData?.title }}</h1>
         <div v-if="openGraphData?.description">
           <div class="">
-            <div class="opacity-90 text-sm whitespace-pre-line line-clamp-5">
+            <div class="opacity-90 text-sm whitespace-pre-line">
               {{ openGraphData?.description }}
             </div>
           </div>
@@ -39,7 +39,7 @@
         </div>
       </a>
       <ClientOnly>
-        <SharePreview :url="data.fullLink" v-model="isPreviewVisible" />
+        <SharePreview :url="data.iframeLink ?? data.fullLink" v-model="isPreviewVisible" />
       </ClientOnly>
       <div class="flex flex-row gap-4 mt-4">
         <a class="border flex-1 flex flex-row items-center gap-2 rounded-2xl p-4 active:bg-opacity-20 transition-colors cursor-pointer"

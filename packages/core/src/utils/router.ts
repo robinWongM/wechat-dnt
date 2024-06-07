@@ -22,6 +22,7 @@ type SanitizerOutput = {
   shortLink?: string;
   universalLink?: string;
   customSchemeLink?: string;
+  iframeLink?: string;
 };
 export type Sanitizer<
   Param extends OptionalObjectSchema,
