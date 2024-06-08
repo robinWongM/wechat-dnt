@@ -27,8 +27,7 @@
     </div>
     <div class="pb-safe h-48"></div>
   </div>
-  <div class="fixed bottom-0 left-0 right-0 dark:bg-[#111] dark:bg-opacity-60 backdrop-blur-2xl"
-    v-if="data">
+  <div class="fixed bottom-0 left-0 right-0 dark:bg-[#111] dark:bg-opacity-60 backdrop-blur-2xl" v-if="data">
     <div ref="actionPanel" class="px-4 pt-4 pb-safe-or-4 max-w-xl mx-auto">
       <a class="flex-1 flex flex-row items-center gap-4 rounded-2xl text-white bg-black dark:bg-white bg-opacity-90 dark:bg-opacity-90 dark:text-black px-6 py-4 active:bg-opacity-80 transition-colors cursor-pointer"
         @click="openPreview">
@@ -61,12 +60,12 @@
         </a>
       </div>
     </div>
+    <Toaster position="bottom-center" :theme="theme" :offset="toastOffset" />
   </div>
-  <Toaster position="bottom-center" :theme="theme" :offset="toastOffset" />
 </template>
 
 <script setup lang="ts">
-import { useClipboard, usePreferredColorScheme, useElementSize } from '@vueuse/core';
+import { useClipboard, usePreferredColorScheme, useElementBounding } from '@vueuse/core';
 import { UAParser } from 'ua-parser-js';
 
 const props = defineProps<{
@@ -86,7 +85,7 @@ const theme = usePreferredColorScheme();
 const isPreviewVisible = ref(false);
 
 const actionPanel = ref<HTMLElement | null>(null);
-const { height } = useElementSize(actionPanel);
+const { height } = useElementBounding(actionPanel);
 const toastOffset = computed(() => `${height.value}px`);
 
 const copyFullLink = () => {
@@ -177,3 +176,12 @@ onMounted(async () => {
   }
 });
 </script>
+
+<style scoped>
+/* Force the toaster use the global offset */
+@media (max-width: 600px) {
+  :deep([data-sonner-toaster][data-y-position='bottom']) {
+    bottom: var(--offset);
+  }
+}
+</style>
