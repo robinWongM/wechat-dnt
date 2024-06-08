@@ -66,7 +66,7 @@
 </template>
 
 <script setup lang="ts">
-import { useClipboard, usePreferredColorScheme, useElementBounding } from '@vueuse/core';
+import { useClipboard, usePreferredColorScheme, useElementSize } from '@vueuse/core';
 import { UAParser } from 'ua-parser-js';
 
 const props = defineProps<{
@@ -86,7 +86,7 @@ const theme = usePreferredColorScheme();
 const isPreviewVisible = ref(false);
 
 const actionPanel = ref<HTMLElement | null>(null);
-const { height } = useElementBounding(actionPanel);
+const { height } = useElementSize(actionPanel);
 const toastOffset = computed(() => `${height.value}px`);
 
 const copyFullLink = () => {
