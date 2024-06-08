@@ -27,9 +27,9 @@
     </div>
     <div class="pb-safe h-48"></div>
   </div>
-  <div ref="actionPanel" class="fixed bottom-0 left-0 right-0 pb-safe-or-4 dark:bg-[#111] dark:bg-opacity-60 backdrop-blur-2xl"
+  <div class="fixed bottom-0 left-0 right-0 dark:bg-[#111] dark:bg-opacity-60 backdrop-blur-2xl"
     v-if="data">
-    <div class="px-4 pt-4 max-w-xl mx-auto">
+    <div ref="actionPanel" class="px-4 pt-4 pb-safe-or-4 max-w-xl mx-auto">
       <a class="flex-1 flex flex-row items-center gap-4 rounded-2xl text-white bg-black dark:bg-white bg-opacity-90 dark:bg-opacity-90 dark:text-black px-6 py-4 active:bg-opacity-80 transition-colors cursor-pointer"
         @click="openPreview">
         <i class=" i-lucide-lollipop w-6 h-6"></i>
