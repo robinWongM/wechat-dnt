@@ -5,7 +5,7 @@
     </div>
     <div
       class="mt-6 border border-black border-opacity-10 dark:border-white dark:border-opacity-10 rounded-2xl overflow-hidden">
-      <div v-if="openGraphData?.images?.[0]" class="relative max-h-[50vh] overflow-hidden">
+      <div v-if="openGraphData?.images?.[0]" class="relative overflow-hidden">
         <img :src="openGraphData?.images?.[0]" alt="" referrerpolicy="no-referrer"
           class="w-full object-contain aspect-video" />
         <img :src="openGraphData?.images?.[0]" alt="" referrerpolicy="no-referrer"
@@ -148,32 +148,40 @@ const isWeChatBrowser = userAgent.toLowerCase().includes('micromessenger');
 
 const { defaultShareImageUrl } = useRuntimeConfig().public;
 onMounted(async () => {
-  if (import.meta.client) {
-    const { config, updateAppMessageShareData } = useWxSdk();
-    const client = useNuxtApp().$client;
-    const wxConfig = await client.getWxConfig.query({
-      url: location.href,
-    });
-
-    await config({
-      ...wxConfig!,
-      debug: true,
-      jsApiList: ['updateAppMessageShareData'],
-      openTagList: [],
-    });
-
-    const description = [
-      `✨ 分享自 ${openGraphData.value?.config.name}`,
-      `📝 ${openGraphData.value?.description}`,
-    ].join('\n');
-
-    await updateAppMessageShareData({
-      title: openGraphData.value?.title || '',
-      desc: description,
-      link: location.href,
-      imgUrl: openGraphData.value?.images?.[0] || defaultShareImageUrl,
-    });
+  if (import.meta.server) {
+    return;
   }
+
+  if (!openGraphData.value) {
+    return;
+  }
+
+  const { config, updateAppMessageShareData } = useWxSdk();
+  const client = useNuxtApp().$client;
+  const wxConfig = await client.getWxConfig.query({
+    url: location.href,
+  });
+
+  await config({
+    ...wxConfig!,
+    debug: true,
+    jsApiList: ['updateAppMessageShareData'],
+    openTagList: [],
+  });
+
+  const { config: { name }, description } = openGraphData.value;
+
+  const desc = `
+  ✨ 分享自 ${name}
+  ${description ? `📝 ${description.replaceAll(/\s+/g, ' ') }` : ''}
+  `.trim();
+
+  await updateAppMessageShareData({
+    title: openGraphData.value?.title || '',
+    desc,
+    link: location.href,
+    imgUrl: openGraphData.value?.images?.[0] || defaultShareImageUrl,
+  });
 });
 </script>
 
