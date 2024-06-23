@@ -171,10 +171,10 @@ onMounted(async () => {
 
   const { config: { name }, description } = openGraphData.value;
 
-  const desc = `
-  ✨ 分享自 ${name}
-  ${description ? `📝 ${description.replaceAll(/\s+/g, ' ') }` : ''}
-  `.trim();
+  const desc = [
+    `✨ 分享自 ${name}`,
+    description ? `📝 ${description.replaceAll(/\s+/g, ' ')}` : '',
+  ].join('\n').trim();
 
   await updateAppMessageShareData({
     title: openGraphData.value?.title || '',
