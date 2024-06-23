@@ -1,13 +1,32 @@
 import { object, string } from "valibot";
 import { Extractor, defineHandler, defineRouter } from "../utils/router";
+import { parseModule } from "esprima";
+import { pickNested } from "../utils/ast";
 
 const extractor: Extractor = async ({ fullLink }, { fetch, loadHtml }) => {
   const resp = await fetch(fullLink);
   const html = await resp.text();
   const $ = loadHtml(html);
 
+  const initialScript = $("script")
+    .toArray()
+    .find((el) => {
+      const scriptContent = $(el).text();
+      return scriptContent.startsWith("window.__INITIAL_STATE__=");
+    });
+  if (!initialScript) {
+    throw new Error("Failed to find initial script");
+  }
+
+  const initialData = $(initialScript)
+    .text()
+    .replace(/^window\.__INITIAL_STATE__=/, "export default ");
+  const module = parseModule(initialData, { range: true });
+
+  const note = pickNested(module.body[0].declaration , "note", "noteDetailMap", "*", "note", "desc")?.value || '';
+
   const title = $("#detail-title").text();
-  const description = $("#detail-desc").find("br").replaceWith("\n").end().text();
+  const description = note.replaceAll(/#(.*?)\[话题\]#/g, "#$1 ");
   const image = $("meta[name='og:image']").attr("content");
 
   return {
