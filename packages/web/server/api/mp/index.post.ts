@@ -53,12 +53,22 @@ const resolveShortLink = async (
   return link;
 };
 
+const useMpMessageQueue = (username: string) => {
+  let promise = Promise.resolve();
+
+  return {
+    send: async (message: string) => {
+      promise = promise.finally(() => mpSendTextMessage(username, message));
+    },
+  };
+};
+
 const handleMpEvent = async (event: z.infer<typeof eventSchema>) => {
   const { MsgType, Event, FromUserName } = event;
+  const { send } = useMpMessageQueue(FromUserName);
 
   if (MsgType === "event" && Event === "subscribe") {
-    return mpSendTextMessage(
-      FromUserName,
+    return send(
       "感谢你关注「别瞅着我」。\n\n发送任意链接 / 微信分享卡片至本公众号，可去除恼人的跟踪参数。"
     );
   }
@@ -68,35 +78,29 @@ const handleMpEvent = async (event: z.infer<typeof eventSchema>) => {
     const originalLink = extractLink(`${linkText}`);
 
     if (!originalLink) {
-      return mpSendTextMessage(FromUserName, "无法识别链接。");
+      return send("无法识别链接。");
     }
 
     if (MsgType === "link") {
-      void mpSendTextMessage(
-        FromUserName,
-        `你发送的 URL 是: \n${originalLink}`
-      );
+      void send(`你发送的 URL 是: \n${originalLink}`);
     }
 
     const link = await resolveShortLink(originalLink);
     if (link !== originalLink) {
-      void mpSendTextMessage(FromUserName, `重定向至：\n${link}`);
+      void send(`重定向至：\n${link}`);
     }
 
     const matchResult = sanitize(link);
     if (!matchResult) {
-      return mpSendTextMessage(FromUserName, "暂不支持此链接。");
+      return send("暂不支持此链接。");
     }
 
     const result = await trpcCaller.scrape({ url: matchResult.fullLink });
     if (!result) {
-      return mpSendTextMessage(FromUserName, "获取链接信息失败。");
+      return send("获取链接信息失败。");
     }
 
-    void mpSendTextMessage(
-      FromUserName,
-      `${result.title}\n${matchResult.fullLink}`
-    );
+    void send(`${result.title}\n${matchResult.fullLink}`);
 
     const parsedUrl = new URL(matchResult.fullLink);
     const shareUrl = new URL(
@@ -106,10 +110,7 @@ const handleMpEvent = async (event: z.infer<typeof eventSchema>) => {
     for (const key of parsedUrl.searchParams.keys()) {
       shareUrl.searchParams.set(key, parsedUrl.searchParams.get(key)!);
     }
-    void mpSendTextMessage(
-      FromUserName,
-      `<a href="${shareUrl.toString()}">轻触此处创建分享卡片</a>`
-    );
+    void send(`<a href="${shareUrl.toString()}">轻触此处创建分享卡片</a>`);
   }
 };
 
