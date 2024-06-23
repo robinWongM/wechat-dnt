@@ -17,6 +17,8 @@
     "@vueuse/core": "^10.10.0",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
+    "domutils": "^3.1.0",
+    "htmlparser2": "^9.1.0",
     "lucide-vue-next": "^0.390.0",
     "nuxt": "^3.11.2",
     "open-graph-scraper": "^6.5.1",
@@ -35,6 +37,7 @@
   "devDependencies": {
     "@egoist/tailwindcss-icons": "^1.7.4",
     "@iconify-json/lucide": "^1.1.183",
+    "@iconify-json/quill": "^1.1.10",
     "@iconify-json/simple-icons": "^1.1.102",
     "@nuxtjs/device": "^3.1.1",
     "@nuxtjs/tailwindcss": "^6.12.0",
