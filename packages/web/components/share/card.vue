@@ -8,8 +8,8 @@
       <div v-if="openGraphData?.images?.[0]" class="relative overflow-hidden">
         <img :src="openGraphData?.images?.[0]" alt="" referrerpolicy="no-referrer"
           class="w-full object-contain pointer-events-none" :class="{'aspect-video': !isOriginalAspect}" />
-        <button class="block absolute right-4 bottom-4 rounded-full p-2 bg-white bg-opacity-10 cursor-pointer" @click="toggleAspect">
-          <span class="block w-4 h-4" :class="isOriginalAspect ? 'i-quill-collapse opacity-75' : 'i-quill-expand'"></span>
+        <button class="block absolute right-4 bottom-4 rounded-full p-2 bg-black text-white backdrop-blur bg-opacity-10 cursor-pointer" @click="toggleAspect">
+          <span class="block w-4 h-4" :class="isOriginalAspect ? 'i-quill-collapse' : 'i-quill-expand'"></span>
         </button>
         <img :src="openGraphData?.images?.[0]" alt="" referrerpolicy="no-referrer"
           class="absolute top-0 left-0 w-full h-full -z-20 object-fill scale-125 blur-3xl" />
