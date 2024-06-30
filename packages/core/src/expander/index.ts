@@ -6,6 +6,7 @@ const SHORT_LINK_DOMAINS = [
   'xhslink.com',
   'm.tb.cn',
   't.cn',
+  'v.douyin.com',
 ];
 
 export const isShortLink = (url: string) => {
