@@ -198,7 +198,7 @@ const openPreview = () => {
 
 const openPlayer = () => {
   const isSupported = checkIsBrowserSupportsPreview();
-  if (!isSupported) {
+  if (isSupported) {
     isPlayerVisible.value = true;
   } else {
     $toast("当前浏览器不支持无痕预览。是否继续？", {
