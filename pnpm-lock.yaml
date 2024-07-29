@@ -233,9 +233,15 @@ importers:
       '@egoist/tailwindcss-icons':
         specifier: ^1.7.4
         version: 1.8.1(tailwindcss@3.4.3)
+      '@iconify-json/heroicons-outline':
+        specifier: ^1.1.10
+        version: 1.1.10
       '@iconify-json/lucide':
         specifier: ^1.1.183
         version: 1.1.189
+      '@iconify-json/material-symbols-light':
+        specifier: ^1.1.25
+        version: 1.1.25
       '@iconify-json/quill':
         specifier: ^1.1.10
         version: 1.1.10
@@ -1363,8 +1369,14 @@ packages:
   '@floating-ui/vue@1.0.6':
     resolution: {integrity: sha512-EdrOljjkpkkqZnrpqUcPoz9NvHxuTjUtSInh6GMv3+Mcy+giY2cE2pHh9rpacRcZ2eMSCxel9jWkWXTjLmY55w==}
 
+  '@iconify-json/heroicons-outline@1.1.10':
+    resolution: {integrity: sha512-3sPszsoIlLLLxxXxJkla6GuNNpJrie/84iE8cbDi+NMkaeHMsfVTOHh3LxLsPRaTBFTSlGflJ2ZWAb1e3Ae7Gw==}
+
   '@iconify-json/lucide@1.1.189':
     resolution: {integrity: sha512-XUmcSwfAhi4ctdbdxMikhy4avUjxSYePHBSyZiVHPPmbOPGM3KjDpP/UscZA49yPAmkFqvb6lUa3L1RHAOn0rQ==}
+
+  '@iconify-json/material-symbols-light@1.1.25':
+    resolution: {integrity: sha512-Ld+biDaXRY1Yrko0BtzGkidwt2MsNFyaql9Mpkfl2wfUfbK0/CCrJCMclRz5+VtGHWkfd5iv1EYqEvceLK805A==}
 
   '@iconify-json/quill@1.1.10':
     resolution: {integrity: sha512-6QVP1pHVGTNcmFHart8SozxjmAhaJTpQ6xoJS7DBqa/wuQgFPjTBblrR/6GEe2vrphQtuYXnT/YKWKLlSlHWHw==}
@@ -7592,7 +7604,15 @@ snapshots:
       - '@vue/composition-api'
       - vue
 
+  '@iconify-json/heroicons-outline@1.1.10':
+    dependencies:
+      '@iconify/types': 2.0.0
+
   '@iconify-json/lucide@1.1.189':
+    dependencies:
+      '@iconify/types': 2.0.0
+
+  '@iconify-json/material-symbols-light@1.1.25':
     dependencies:
       '@iconify/types': 2.0.0
 

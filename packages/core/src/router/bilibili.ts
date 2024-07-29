@@ -43,9 +43,10 @@ function bv2av(bvid: string) {
 }
 
 function getVideoLink(bvId: string, query: { t?: number; p?: number }) {
-  const timeQuery = stringify(query, true);
-  const fullLink = `https://www.bilibili.com/video/${bvId}${timeQuery}`;
-  const shortLink = `https://b23.tv/${bvId}${timeQuery}`;
+  const timeQuery = stringify(query, false);
+  const timeQueryWithPrefix = timeQuery ? `?${timeQuery}` : '';
+  const fullLink = `https://www.bilibili.com/video/${bvId}${timeQueryWithPrefix}`;
+  const shortLink = `https://b23.tv/${bvId}${timeQueryWithPrefix}`;
   const universalLink = `https://www.bilibili.com/video/${bvId}`;
 
   const mobileQuery = stringify(
@@ -56,12 +57,14 @@ function getVideoLink(bvId: string, query: { t?: number; p?: number }) {
     true
   );
   const customSchemeLink = `bilibili://video/${bv2av(bvId)}${mobileQuery}`;
+  const embedLink = `https://player.bilibili.com/player.html?isOutside=true&bvid=${bvId}`;
 
   return {
     fullLink,
     shortLink,
     universalLink,
     customSchemeLink,
+    embedLink,
   };
 }
 
@@ -149,17 +152,21 @@ export default defineRouter(
         title,
         description,
         images: [pic],
+        author: {
+          name,
+          avatar: face,
+        },
         metadata: [
           { label: "UP 主", icon: "", value: name },
-          {
-            label: "时长",
-            icon: "",
-            value: dayjs
-              .duration(parseInt(duration, 10), "seconds")
-              .format("mm:ss"),
-          },
-          { label: "播放量", icon: "", value: view },
-          { label: "发布时间", icon: "", value: dayjs(ctime * 1000).locale('zh-cn').fromNow() },
+          // {
+          //   label: "时长",
+          //   icon: "",
+          //   value: dayjs
+          //     .duration(parseInt(duration, 10), "seconds")
+          //     .format("mm:ss"),
+          // },
+          // { label: "播放量", icon: "", value: view },
+          // { label: "发布时间", icon: "", value: dayjs(ctime * 1000).locale('zh-cn').fromNow() },
         ],
       };
     },

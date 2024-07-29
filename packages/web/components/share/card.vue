@@ -1,81 +1,121 @@
 <template>
-  <div class="px-4 py-6 max-w-xl mx-auto" v-if="openGraphData">
-    <div class="flex flex-row gap-2 w-full">
-      <ShareLogo :name="openGraphData.config.id" />
+  <div class="max-w-xl mx-auto flex flex-col gap-4 py-4" v-if="openGraphData">
+    <ShareLogo :name="openGraphData.config.id" class="w-full my-4" />
+    <div class="px-4 flex flex-col gap-2">
+      <h1 class="font-semibold text-xl">{{ openGraphData?.title }}</h1>
+      <div
+        v-if="openGraphData?.author"
+        class="flex flex-row items-center gap-2"
+      >
+        <img
+          class="w-6 h-6 rounded-full"
+          referrerpolicy="no-referrer"
+          :src="openGraphData.author.avatar"
+        />
+        <span class="opacity-80">{{ openGraphData?.author.name }}</span>
+      </div>
     </div>
     <div
-      class="mt-6 border border-black border-opacity-10 dark:border-white dark:border-opacity-10 rounded-2xl overflow-hidden">
-      <div v-if="openGraphData?.images?.[0]" class="relative overflow-hidden">
-        <img :src="openGraphData?.images?.[0]" alt="" referrerpolicy="no-referrer"
-          class="w-full object-contain pointer-events-none" :class="{'aspect-video': !isOriginalAspect}" />
-        <button class="block absolute right-4 bottom-4 rounded-full p-2 bg-black text-white backdrop-blur bg-opacity-10 cursor-pointer" @click="toggleAspect">
-          <span class="block w-4 h-4" :class="isOriginalAspect ? 'i-quill-collapse' : 'i-quill-expand'"></span>
-        </button>
-        <img :src="openGraphData?.images?.[0]" alt="" referrerpolicy="no-referrer"
-          class="absolute top-0 left-0 w-full h-full -z-20 object-fill scale-125 blur-3xl" />
-      </div>
-      <div class="p-4 flex flex-col gap-2">
-        <h1 class="font-semibold text-xl">{{ openGraphData?.title }}</h1>
-        <div v-if="openGraphData?.description">
-          <div class="">
-            <div class="opacity-90 text-base whitespace-pre-line">
-              {{ openGraphData?.description }}
-            </div>
-          </div>
+      class="flex flex-col overflow-hidden"
+      v-if="openGraphData?.images?.[0]"
+    >
+      <div
+        class="w-full relative overflow-hidden"
+        style="container-type: inline-size"
+      >
+        <img
+          :src="openGraphData.images[0]"
+          alt=""
+          referrerpolicy="no-referrer"
+          class="w-full max-h-[100cqw] object-contain pointer-events-none"
+        />
+        <img
+          :src="openGraphData.images[0]"
+          alt=""
+          referrerpolicy="no-referrer"
+          class="absolute top-0 left-0 right-0 bottom-0 -z-20 object-fill scale-125 blur-3xl"
+        />
+        <div
+          v-if="data?.embedLink"
+          class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full bg-black bg-opacity-40 cursor-pointer backdrop-blur-2xl backdrop-contrast-150"
+          @click="openPlayer"
+        >
+          <i
+            class="block w-16 h-16 text-white i-material-symbols-light-play-arrow-outline-rounded"
+          />
         </div>
-      </div>
-      <div class="px-4 py-3 text-sm border-t opacity-60">
-        <span class="inline align-middle break-all">{{ data?.fullLink }}</span>
+        <ShareIframe
+          class="absolute top-0 left-0 right-0 bottom-0"
+          v-if="data?.embedLink && isPlayerVisible"
+          :src="data.embedLink"
+        />
       </div>
     </div>
-    <div class="pb-safe h-48"></div>
+    <div
+      v-if="openGraphData?.description"
+      class="opacity-90 px-4 text-base whitespace-pre-line break-words"
+    >
+      {{ openGraphData?.description }}
+    </div>
+    <div
+      class="mb-safe-offset-8"
+      :style="{ height: `${actionPanelHeight}px` }"
+    ></div>
   </div>
-  <div class="fixed bottom-0 left-0 right-0 dark:bg-[#111] dark:bg-opacity-60 backdrop-blur-2xl" v-if="data">
-    <div ref="actionPanel" class="px-4 pt-4 pb-safe-or-4 max-w-xl mx-auto">
-      <a class="flex-1 flex flex-row items-center gap-4 rounded-2xl text-white bg-black dark:bg-white bg-opacity-90 dark:bg-opacity-90 dark:text-black px-6 py-4 active:bg-opacity-80 transition-colors cursor-pointer"
-        @click="openPreview">
-        <i class=" i-lucide-lollipop w-6 h-6"></i>
-        <div class="flex flex-col items-start flex-1">
-          <span class="text-base">无痕预览原网页</span>
-          <span class="text-xs opacity-60 line-clamp-1">在支持的浏览器中屏蔽原网站的 Cookies</span>
-        </div>
-      </a>
-      <ClientOnly>
-        <SharePreview :url="data.iframeLink ?? data.fullLink" v-model="isPreviewVisible" />
-      </ClientOnly>
-      <div class="flex flex-row gap-4 mt-4">
-        <a class="border flex-1 flex flex-row bg-background items-center gap-2 rounded-2xl px-4 py-3 active:bg-opacity-20 transition-colors cursor-pointer"
-          @click="copyFullLink">
-          <i class="i-lucide-copy w-4 h-4"></i>
-          <div class="flex flex-col items-end flex-1 text-right">
-            <span class="text-base">复制链接</span>
-            <span class="text-xs opacity-40 line-clamp-1">已去除跟踪参数</span>
-          </div>
-        </a>
-        <a class="border flex-1 flex flex-row bg-background items-center gap-2 rounded-2xl px-4 py-3 active:bg-opacity-20 transition-colors"
-          :href="data?.fullLink" referrerpolicy="no-referrer">
-          <i class="i-lucide-arrow-right w-4 h-4"></i>
-          <div class="flex flex-col items-end flex-1 text-right">
-            <span class="text-base">直接打开</span>
-            <span v-if="isWeChatBrowser" class="text-xs opacity-40 line-clamp-1">使用微信内置浏览器</span>
-            <span v-else class="text-xs opacity-40 line-clamp-1">使用当前浏览器</span>
-          </div>
+  <div class="fixed left-6 right-6 bottom-safe-offset-8">
+    <div
+      class="max-w-xl mx-auto rounded-2xl bg-zinc-900 shadow-2xl dark:shadow-zinc-900 dark:border"
+      ref="actionPanel"
+      v-if="data"
+    >
+      <div class="text-sky-500 px-4 pt-3 text-center text-sm group">
+        <a
+          class="inline"
+          :href="data.fullLink"
+          target="_blank"
+          referrerpolicy="no-referrer"
+        >
+          <span class="break-words align-middle mr-1 group-hover:underline underline-offset-2">{{ data.fullLink }}</span>
+          <i class="w-4 h-4 i-heroicons-outline-external-link align-middle"></i>
         </a>
       </div>
+      <div class="flex flex-row justify-between text-zinc-50 items-center">
+        <div class="p-3 pt-2 cursor-pointer">
+          <i
+            class="block w-6 h-6 i-material-symbols-light-info-outline-rounded"
+          ></i>
+        </div>
+        <div class="opacity-40 pb-1 text-xs">原网页链接</div>
+        <div class="p-3 pt-2 cursor-pointer" @click="copyFullLink">
+          <i
+            class="block w-6 h-6 i-material-symbols-light-content-copy-outline-rounded"
+          ></i>
+        </div>
+      </div>
     </div>
-    <Toaster position="bottom-center" :theme="theme" :offset="toastOffset" />
   </div>
+  <ClientOnly>
+    <Toaster position="top-center" :theme="theme" :offset="toastOffset" />
+    <SharePreview
+      :url="data.iframeLink ?? data.fullLink"
+      v-model="isPreviewVisible"
+    />
+  </ClientOnly>
 </template>
 
 <script setup lang="ts">
-import { useClipboard, usePreferredColorScheme, useElementBounding } from '@vueuse/core';
-import { UAParser } from 'ua-parser-js';
+import {
+  useClipboard,
+  usePreferredColorScheme,
+  useElementBounding,
+} from "@vueuse/core";
+import { UAParser } from "ua-parser-js";
 
 const props = defineProps<{
   url: string;
 }>();
 
-const { $client, $toast } = useNuxtApp()
+const { $client, $toast } = useNuxtApp();
 const { data } = await $client.sanitize.useQuery({
   text: props.url,
 });
@@ -86,23 +126,25 @@ const { data: openGraphData } = await $client.scrape.useQuery({
 const { copy } = useClipboard();
 const theme = usePreferredColorScheme();
 const isPreviewVisible = ref(false);
+const isPlayerVisible = ref(false);
 
 const actionPanel = ref<HTMLElement | null>(null);
-const { height } = useElementBounding(actionPanel);
-const toastOffset = computed(() => `${height.value}px`);
+const { top, height: actionPanelHeight } = useElementBounding(actionPanel);
+const toastOffset = computed(() => `${top.value - 64}px`);
 
 const copyFullLink = () => {
   copy(data.value?.fullLink!)
     .then(() => {
-      $toast.success('链接已复制。', {
+      $toast.success("链接已复制。", {
         duration: 2000,
       });
-    }).catch(() => {
-      $toast.error('复制失败。可尝试手动复制。', {
+    })
+    .catch(() => {
+      $toast.error("复制失败。可尝试手动复制。", {
         duration: 2000,
       });
     });
-}
+};
 
 const { userAgent } = useDevice();
 const isMajorAbove = (version: string | undefined, target: number) => {
@@ -110,7 +152,7 @@ const isMajorAbove = (version: string | undefined, target: number) => {
     return false;
   }
 
-  const [major] = version.split('.');
+  const [major] = version.split(".");
   return Number(major) >= target;
 };
 const checkIsBrowserSupportsPreview = () => {
@@ -120,16 +162,16 @@ const checkIsBrowserSupportsPreview = () => {
 
   const { browser, os, engine } = UAParser(userAgent);
 
-  if (browser.name === 'Safari' || browser.name === 'Mobile Safari') {
+  if (browser.name === "Safari" || browser.name === "Mobile Safari") {
     return isMajorAbove(os.version, 14);
   }
-  if (browser.name === 'WeChat' && os.name === 'iOS') {
+  if (browser.name === "WeChat" && os.name === "iOS") {
     return isMajorAbove(os.version, 14);
   }
-  if (engine.name === 'Blink') {
+  if (engine.name === "Blink") {
     return isMajorAbove(engine.version, 120);
   }
-  if (engine.name === 'Gecko') {
+  if (engine.name === "Gecko") {
     return isMajorAbove(engine.version, 115);
   }
 
@@ -141,18 +183,32 @@ const openPreview = () => {
   if (isSupported) {
     isPreviewVisible.value = true;
   } else {
-    $toast.error('当前浏览器不支持无痕预览。', {
+    $toast.error("当前浏览器不支持无痕预览。", {
       duration: 2000,
     });
   }
 };
 
-const isOriginalAspect = ref(false);
-const toggleAspect = () => {
-  isOriginalAspect.value = !isOriginalAspect.value;
+const openPlayer = () => {
+  const isSupported = checkIsBrowserSupportsPreview();
+  if (!isSupported) {
+    isPlayerVisible.value = true;
+  } else {
+    $toast("当前浏览器不支持无痕预览。是否继续？", {
+      action: {
+        label: "继续",
+        onClick: () => {
+          isPlayerVisible.value = true;
+        },
+      },
+      cancel: {
+        label: "取消",
+      },
+    });
+  }
 };
 
-const isWeChatBrowser = userAgent.toLowerCase().includes('micromessenger');
+const isWeChatBrowser = userAgent.toLowerCase().includes("micromessenger");
 
 const { defaultShareImageUrl } = useRuntimeConfig().public;
 onMounted(async () => {
@@ -173,19 +229,29 @@ onMounted(async () => {
   await config({
     ...wxConfig!,
     debug: true,
-    jsApiList: ['updateAppMessageShareData'],
+    jsApiList: ["updateAppMessageShareData"],
     openTagList: [],
   });
 
-  const { config: { name }, description } = openGraphData.value;
+  const {
+    config: { id, name },
+    author,
+    description,
+  } = openGraphData.value;
+
+  const authorLabel = id === 'bilibili' ? 'UP 主' : '作者';
 
   const desc = [
     `✨ 分享自 ${name}`,
-    description ? `📝 ${description.replaceAll(/\s+/g, ' ')}` : '',
-  ].join('\n').trim();
+    author ? `🧑‍💻 ${authorLabel}: ${author.name}` : "",
+    description ? `📝 ${description.replaceAll(/\s+/g, " ")}` : "",
+  ]
+    .filter(item => item)
+    .join("\n")
+    .trim();
 
   await updateAppMessageShareData({
-    title: openGraphData.value?.title || '',
+    title: openGraphData.value?.title || "",
     desc,
     link: location.href,
     imgUrl: openGraphData.value?.images?.[0] || defaultShareImageUrl,
@@ -196,8 +262,8 @@ onMounted(async () => {
 <style scoped>
 /* Force the toaster use the global offset */
 @media (max-width: 600px) {
-  :deep([data-sonner-toaster][data-y-position='bottom']) {
-    bottom: var(--offset);
+  :deep([data-sonner-toaster][data-y-position="top"]) {
+    top: var(--offset);
   }
 }
 </style>

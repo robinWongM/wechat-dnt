@@ -36,7 +36,9 @@
   },
   "devDependencies": {
     "@egoist/tailwindcss-icons": "^1.7.4",
+    "@iconify-json/heroicons-outline": "^1.1.10",
     "@iconify-json/lucide": "^1.1.183",
+    "@iconify-json/material-symbols-light": "^1.1.25",
     "@iconify-json/quill": "^1.1.10",
     "@iconify-json/simple-icons": "^1.1.102",
     "@nuxtjs/device": "^3.1.1",

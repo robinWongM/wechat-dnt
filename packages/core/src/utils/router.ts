@@ -23,6 +23,7 @@ type SanitizerOutput = {
   universalLink?: string;
   customSchemeLink?: string;
   iframeLink?: string;
+  embedLink?: string;
 };
 export type Sanitizer<
   Param extends OptionalObjectSchema,
@@ -40,6 +41,10 @@ type ExtractMetadata = {
 type ExtractorOutput = {
   title: string;
   description?: string;
+  author?: {
+    name: string;
+    avatar?: string;
+  };
   metadata?: ExtractMetadata[];
   images: string[];
 };

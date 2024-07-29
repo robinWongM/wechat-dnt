@@ -53,7 +53,11 @@ export const appRouter = router({
         },
       });
       const loadHtml = (html: string) => {
-        return load(html);
+        return load(html, {
+          xml: {
+            xmlMode: false,
+          }
+        });
       }
       const result = await matchResult.extract({ fetch: ofetch, loadHtml });
 
