@@ -1,6 +1,6 @@
 <template>
   <div class="max-w-xl mx-auto flex flex-col gap-4 py-4" v-if="openGraphData">
-    <ShareLogo :name="openGraphData.config.id" class="w-full my-4" />
+    <ShareLogo :name="openGraphData.config.id" class="mx-auto my-4" />
     <div class="px-4 flex flex-col gap-2">
       <h1 class="font-semibold text-xl">{{ openGraphData?.title }}</h1>
       <div
@@ -62,34 +62,41 @@
       :style="{ height: `${actionPanelHeight}px` }"
     ></div>
   </div>
-  <div class="fixed left-6 right-6 bottom-safe-offset-8">
-    <div
-      class="max-w-xl mx-auto rounded-2xl bg-zinc-900 shadow-2xl dark:shadow-zinc-900 dark:border"
-      ref="actionPanel"
-      v-if="data"
-    >
-      <div class="text-sky-500 px-4 pt-3 text-center text-sm group">
-        <a
-          class="inline"
-          :href="data.fullLink"
-          target="_blank"
-          referrerpolicy="no-referrer"
-        >
-          <span class="break-words align-middle mr-1 group-hover:underline underline-offset-2">{{ data.fullLink }}</span>
-          <i class="w-4 h-4 i-heroicons-outline-external-link align-middle"></i>
-        </a>
-      </div>
-      <div class="flex flex-row justify-between text-zinc-50 items-center">
-        <div class="p-3 pt-2 cursor-pointer">
-          <i
-            class="block w-6 h-6 i-material-symbols-light-info-outline-rounded"
-          ></i>
+  <div class="fixed left-0 right-0 bottom-safe-offset-8">
+    <div class="max-w-xl mx-auto px-6">
+      <div
+        class="rounded-2xl bg-zinc-900 shadow-2xl dark:shadow-zinc-900 dark:border"
+        ref="actionPanel"
+        v-if="data"
+      >
+        <div class="text-sky-500 px-4 pt-3 text-center text-sm group">
+          <a
+            class="inline"
+            :href="data.fullLink"
+            target="_blank"
+            referrerpolicy="no-referrer"
+          >
+            <span
+              class="break-words align-middle mr-1 group-hover:underline underline-offset-2"
+              >{{ data.fullLink }}</span
+            >
+            <i
+              class="w-4 h-4 i-heroicons-outline-external-link align-middle"
+            ></i>
+          </a>
         </div>
-        <div class="opacity-40 pb-1 text-xs">原网页链接</div>
-        <div class="p-3 pt-2 cursor-pointer" @click="copyFullLink">
-          <i
-            class="block w-6 h-6 i-material-symbols-light-content-copy-outline-rounded"
-          ></i>
+        <div class="flex flex-row justify-between text-zinc-50 items-center">
+          <div class="p-3 pt-2 cursor-pointer">
+            <i
+              class="block w-6 h-6 i-material-symbols-light-info-outline-rounded"
+            ></i>
+          </div>
+          <div class="opacity-40 pb-1 text-xs">原网页链接</div>
+          <div class="p-3 pt-2 cursor-pointer" @click="copyFullLink">
+            <i
+              class="block w-6 h-6 i-material-symbols-light-content-copy-outline-rounded"
+            ></i>
+          </div>
         </div>
       </div>
     </div>
@@ -239,14 +246,14 @@ onMounted(async () => {
     description,
   } = openGraphData.value;
 
-  const authorLabel = id === 'bilibili' ? 'UP 主' : '作者';
+  const authorLabel = id === "bilibili" ? "UP 主" : "作者";
 
   const desc = [
     `✨ 分享自 ${name}`,
     author ? `🧑‍💻 ${authorLabel}: ${author.name}` : "",
     description ? `📝 ${description.replaceAll(/\s+/g, " ")}` : "",
   ]
-    .filter(item => item)
+    .filter((item) => item)
     .join("\n")
     .trim();
 
