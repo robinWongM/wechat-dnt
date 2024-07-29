@@ -86,13 +86,13 @@
           </a>
         </div>
         <div class="flex flex-row justify-between text-zinc-50 items-center">
-          <div class="p-2 pl-3 cursor-pointer">
+          <div class="p-2 pl-3 cursor-pointer active:bg-zinc-800 rounded-bl-2xl rounded-tr-2xl" @click="openPreview">
             <i
               class="block w-8 h-8 i-material-symbols-light-eyeglasses-rounded"
             ></i>
           </div>
           <div class="opacity-40 text-xs">原网页链接</div>
-          <div class="p-3 pl-4 cursor-pointer" @click="copyFullLink">
+          <div class="p-3 pl-4 cursor-pointer active:bg-zinc-800 rounded-tl-2xl rounded-br-2xl" @click="copyFullLink">
             <i
               class="block w-6 h-6 i-material-symbols-light-content-copy-outline-rounded"
             ></i>
