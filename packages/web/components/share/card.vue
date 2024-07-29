@@ -58,11 +58,11 @@
       {{ openGraphData?.description }}
     </div>
     <div
-      class="mb-safe-offset-8"
+      class="mb-safe-offset-6"
       :style="{ height: `${actionPanelHeight}px` }"
     ></div>
   </div>
-  <div class="fixed left-0 right-0 bottom-safe-offset-8">
+  <div class="fixed left-0 right-0 bottom-safe-offset-6">
     <div class="max-w-xl mx-auto px-6">
       <div
         class="rounded-2xl bg-zinc-900 shadow-2xl dark:shadow-zinc-900 dark:border"
