@@ -148,7 +148,7 @@ export default defineRouter(
         stat: { view, danmaku, like },
       } = videoData;
 
-      const description = desc === '-' ? '' : desc;
+      const description = desc === '-' ? '' : loadHtml(desc).root().text();
 
       return {
         title,
