@@ -44,9 +44,11 @@ function bv2av(bvid: string) {
 
 function getVideoLink(bvId: string, query: { t?: number; p?: number }) {
   const timeQuery = stringify(query, false);
-  const timeQueryWithPrefix = timeQuery ? `?${timeQuery}` : '';
-  const fullLink = `https://www.bilibili.com/video/${bvId}${timeQueryWithPrefix}`;
-  const shortLink = `https://b23.tv/${bvId}${timeQueryWithPrefix}`;
+  const timeQueryWithQuestionMark = timeQuery ? `?${timeQuery}` : '';
+  const timeQueryWithAndMark = timeQuery ? `&${timeQuery}` : '';
+
+  const fullLink = `https://www.bilibili.com/video/${bvId}${timeQueryWithQuestionMark}`;
+  const shortLink = `https://b23.tv/${bvId}${timeQueryWithQuestionMark}`;
   const universalLink = `https://www.bilibili.com/video/${bvId}`;
 
   const mobileQuery = stringify(
@@ -57,7 +59,7 @@ function getVideoLink(bvId: string, query: { t?: number; p?: number }) {
     true
   );
   const customSchemeLink = `bilibili://video/${bv2av(bvId)}${mobileQuery}`;
-  const embedLink = `https://player.bilibili.com/player.html?isOutside=true&bvid=${bvId}`;
+  const embedLink = `https://player.bilibili.com/player.html?isOutside=true&bvid=${bvId}${timeQueryWithAndMark}`;
 
   return {
     fullLink,
@@ -151,7 +153,9 @@ export default defineRouter(
       return {
         title,
         description,
-        images: [pic],
+        images: [
+          pic.replace(/^http:/, "https:"),
+        ],
         author: {
           name,
           avatar: face,
