@@ -3,99 +3,48 @@
     <ShareLogo :name="openGraphData.config.id" class="mx-auto my-4" />
     <div class="px-4 flex flex-col gap-2">
       <h1 class="font-semibold text-xl">{{ openGraphData?.title }}</h1>
-      <div
-        v-if="openGraphData?.author"
-        class="flex flex-row items-center gap-2"
-      >
-        <img
-          class="w-6 h-6 rounded-full"
-          referrerpolicy="no-referrer"
-          :src="openGraphData.author.avatar"
-        />
+      <div v-if="openGraphData?.author" class="flex flex-row items-center gap-2">
+        <img class="w-6 h-6 rounded-full" referrerpolicy="no-referrer" :src="openGraphData.author.avatar" />
         <span class="opacity-80">{{ openGraphData?.author.name }}</span>
       </div>
     </div>
-    <div
-      class="flex flex-col overflow-hidden"
-      v-if="openGraphData?.images?.[0]"
-    >
-      <div
-        class="w-full relative overflow-hidden"
-        style="container-type: inline-size"
-      >
-        <img
-          :src="openGraphData.images[0]"
-          alt=""
-          referrerpolicy="no-referrer"
-          class="w-full max-h-[100cqw] object-contain pointer-events-none"
-        />
-        <img
-          :src="openGraphData.images[0]"
-          alt=""
-          referrerpolicy="no-referrer"
-          class="absolute top-0 left-0 right-0 bottom-0 -z-20 object-fill scale-125 blur-3xl"
-        />
-        <div
-          v-if="data?.embedLink"
+    <div class="flex flex-col overflow-hidden" v-if="openGraphData?.images?.[0]">
+      <div class="w-full relative overflow-hidden" style="container-type: inline-size">
+        <img :src="openGraphData.images[0]" alt="" referrerpolicy="no-referrer"
+          class="w-full max-h-[100cqw] object-contain pointer-events-none" />
+        <img :src="openGraphData.images[0]" alt="" referrerpolicy="no-referrer"
+          class="absolute top-0 left-0 right-0 bottom-0 -z-20 object-fill scale-125 blur-3xl" />
+        <div v-if="data?.embedLink"
           class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full bg-black bg-opacity-40 cursor-pointer backdrop-blur-2xl backdrop-contrast-150"
-          @click="openPlayer"
-        >
-          <i
-            class="block w-16 h-16 text-white i-material-symbols-light-play-arrow-outline-rounded"
-          />
+          @click="openPlayer">
+          <i class="block w-16 h-16 text-white i-material-symbols-light-play-arrow-outline-rounded" />
         </div>
-        <ShareIframe
-          class="absolute top-0 left-0 right-0 bottom-0"
-          v-if="data?.embedLink && isPlayerVisible"
-          :src="data.embedLink"
-        />
+        <ShareIframe class="absolute top-0 left-0 right-0 bottom-0" v-if="data?.embedLink && isPlayerVisible"
+          :src="data.embedLink" />
       </div>
     </div>
-    <div
-      v-if="openGraphData?.description"
-      class="opacity-90 px-4 text-base whitespace-pre-line break-words"
-    >
+    <div v-if="openGraphData?.description" class="opacity-90 px-4 text-base whitespace-pre-line break-words">
       {{ openGraphData?.description }}
     </div>
-    <div
-      class="mb-safe-offset-6"
-      :style="{ height: `${actionPanelHeight}px` }"
-    ></div>
+    <div class="mb-safe-offset-6" :style="{ height: `${actionPanelHeight}px` }"></div>
   </div>
   <div class="fixed left-0 right-0 bottom-safe-offset-6">
     <div class="max-w-xl mx-auto px-6">
-      <div
-        class="rounded-2xl bg-zinc-900 shadow-2xl dark:shadow-zinc-900 dark:border"
-        ref="actionPanel"
-        v-if="data"
-      >
+      <div class="rounded-2xl bg-zinc-900 shadow-2xl dark:shadow-zinc-900 dark:border" ref="actionPanel" v-if="data">
         <div class="text-sky-500 px-4 pt-3 text-center text-sm group">
-          <a
-            class="inline"
-            :href="data.fullLink"
-            target="_blank"
-            referrerpolicy="no-referrer"
-          >
-            <span
-              class="break-words align-middle mr-1 group-hover:underline underline-offset-2"
-              >{{ data.fullLink }}</span
-            >
-            <i
-              class="w-4 h-4 i-heroicons-outline-external-link align-middle"
-            ></i>
+          <a class="inline" :href="data.fullLink" target="_blank" referrerpolicy="no-referrer">
+            <span class="break-words align-middle mr-1 group-hover:underline underline-offset-2">{{ data.fullLink
+              }}</span>
+            <i class="w-4 h-4 i-heroicons-outline-external-link align-middle"></i>
           </a>
         </div>
         <div class="flex flex-row justify-between text-zinc-50 items-center">
           <div class="p-2 pl-3 cursor-pointer active:bg-zinc-800 rounded-bl-2xl rounded-tr-2xl" @click="openPreview">
-            <i
-              class="block w-8 h-8 i-material-symbols-light-eyeglasses-rounded"
-            ></i>
+            <i class="block w-8 h-8 i-material-symbols-light-eyeglasses-rounded"></i>
           </div>
           <div class="opacity-40 text-xs">原网页链接</div>
           <div class="p-3 pl-4 cursor-pointer active:bg-zinc-800 rounded-tl-2xl rounded-br-2xl" @click="copyFullLink">
-            <i
-              class="block w-6 h-6 i-material-symbols-light-content-copy-outline-rounded"
-            ></i>
+            <i class="block w-6 h-6 i-material-symbols-light-content-copy-outline-rounded"></i>
           </div>
         </div>
       </div>
@@ -103,10 +52,7 @@
   </div>
   <ClientOnly>
     <Toaster position="top-center" :theme="theme" :offset="toastOffset" />
-    <SharePreview
-      :url="data.iframeLink ?? data.fullLink"
-      v-model="isPreviewVisible"
-    />
+    <SharePreview :url="data.iframeLink ?? data.fullLink" v-model="isPreviewVisible" />
   </ClientOnly>
 </template>
 
@@ -255,6 +201,10 @@ useHead({
     {
       property: "og:description",
       content: shareData.value.description,
+    },
+    {
+      name: "description",
+      content: shareData.value.originalUrl,
     },
     {
       property: "og:image",
