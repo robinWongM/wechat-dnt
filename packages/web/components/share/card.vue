@@ -215,9 +215,54 @@ const openPlayer = () => {
   }
 };
 
-const isWeChatBrowser = userAgent.toLowerCase().includes("micromessenger");
-
 const { defaultShareImageUrl } = useRuntimeConfig().public;
+const shareData = ref({
+  title: '',
+  description: '',
+  imageUrl: defaultShareImageUrl,
+  originalUrl: data.value?.fullLink,
+});
+
+if (openGraphData.value) {
+  const {
+    config: { id, name },
+    author,
+    description,
+  } = openGraphData.value;
+
+  const authorLabel = id === "bilibili" ? "UP 主" : "作者";
+
+  const desc = [
+    `✨ 分享自 ${name}`,
+    author ? `🧑‍💻 ${authorLabel}: ${author.name}` : "",
+    description ? `📝 ${description.replaceAll(/\s+/g, " ")}` : "",
+  ]
+    .filter((item) => item)
+    .join("\n")
+    .trim();
+
+  shareData.value.title = openGraphData.value?.title || "";
+  shareData.value.description = desc;
+  shareData.value.imageUrl = openGraphData.value?.images?.[0] || defaultShareImageUrl;
+}
+
+useHead({
+  meta: [
+    {
+      property: "og:title",
+      content: shareData.value.title,
+    },
+    {
+      property: "og:description",
+      content: shareData.value.description,
+    },
+    {
+      property: "og:image",
+      content: shareData.value.imageUrl,
+    },
+  ],
+})
+
 onMounted(async () => {
   if (import.meta.server) {
     return;
@@ -240,28 +285,11 @@ onMounted(async () => {
     openTagList: [],
   });
 
-  const {
-    config: { id, name },
-    author,
-    description,
-  } = openGraphData.value;
-
-  const authorLabel = id === "bilibili" ? "UP 主" : "作者";
-
-  const desc = [
-    `✨ 分享自 ${name}`,
-    author ? `🧑‍💻 ${authorLabel}: ${author.name}` : "",
-    description ? `📝 ${description.replaceAll(/\s+/g, " ")}` : "",
-  ]
-    .filter((item) => item)
-    .join("\n")
-    .trim();
-
   await updateAppMessageShareData({
-    title: openGraphData.value?.title || "",
-    desc,
+    title: shareData.value.title,
+    desc: shareData.value.description,
     link: location.href,
-    imgUrl: openGraphData.value?.images?.[0] || defaultShareImageUrl,
+    imgUrl: shareData.value.imageUrl,
   });
 });
 </script>
