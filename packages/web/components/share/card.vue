@@ -61,6 +61,7 @@ import {
   useClipboard,
   usePreferredColorScheme,
   useElementBounding,
+  useTitle,
 } from "@vueuse/core";
 import { UAParser } from "ua-parser-js";
 
@@ -192,6 +193,7 @@ if (openGraphData.value) {
   shareData.value.imageUrl = openGraphData.value?.images?.[0] || defaultShareImageUrl;
 }
 
+useTitle(shareData.value.title);
 useHead({
   meta: [
     {
@@ -203,10 +205,6 @@ useHead({
       content: shareData.value.description,
     },
     {
-      name: "description",
-      content: shareData.value.description,
-    },
-    {
       property: "og:image",
       content: shareData.value.imageUrl,
     },
@@ -214,10 +212,6 @@ useHead({
 })
 
 onMounted(async () => {
-  if (import.meta.server) {
-    return;
-  }
-
   if (!openGraphData.value) {
     return;
   }
