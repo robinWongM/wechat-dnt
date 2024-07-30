@@ -204,7 +204,7 @@ useHead({
     },
     {
       name: "description",
-      content: shareData.value.originalUrl,
+      content: shareData.value.description,
     },
     {
       property: "og:image",
