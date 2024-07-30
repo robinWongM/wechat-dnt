@@ -201,6 +201,10 @@ useHead({
       content: shareData.value.title,
     },
     {
+      name: "description",
+      content: shareData.value.description,
+    },
+    {
       property: "og:description",
       content: shareData.value.description,
     },
