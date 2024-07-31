@@ -6,5 +6,5 @@ export const extractLink = (text: string) => {
     return;
   }
 
-  return urls[0].value;
+  return urls[0].href;
 }
