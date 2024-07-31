@@ -15,7 +15,7 @@
         <img :src="openGraphData.images[0]" alt="" referrerpolicy="no-referrer"
           class="absolute top-0 left-0 right-0 bottom-0 -z-20 object-fill scale-125 blur-3xl" />
         <div v-if="data?.embedLink"
-          class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full bg-black bg-opacity-40 cursor-pointer backdrop-blur-2xl backdrop-contrast-150"
+          class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full bg-black bg-opacity-20 cursor-pointer backdrop-blur-xl backdrop-contrast-150"
           @click="openPlayer">
           <i class="block w-16 h-16 text-white i-material-symbols-light-play-arrow-outline-rounded" />
         </div>
