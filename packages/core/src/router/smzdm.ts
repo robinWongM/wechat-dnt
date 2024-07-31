@@ -11,6 +11,11 @@ const communityLink = (postId: string) => ({
   universalLink: `https://post.smzdm.com/p/${postId}`,
 });
 
+const communityTalk = (postId: string) => ({
+  fullLink: `https://post.smzdm.com/talk/p/${postId}`,
+  universalLink: `https://post.smzdm.com/talk/p/${postId}`,
+});
+
 export default defineRouter(
   {
     id: "smzdm",
@@ -42,4 +47,15 @@ export default defineRouter(
     sanitizer: ({ param: { postId } }) => communityLink(postId),
   }),
 
+  defineHandler({
+    pattern: {
+      host: [
+        "post.smzdm.com",
+        "post.m.smzdm.com",
+      ],
+      path: "/talk/p/:postId",
+      param: object({ postId: string() }),
+    },
+    sanitizer: ({ param: { postId } }) => communityTalk(postId),
+  }),
 );
