@@ -6,9 +6,10 @@ import weibo from "./weibo";
 import xiaohongshu from "./xiaohongshu";
 import douyin from "./douyin";
 import wechat from "./wechat";
+import smzdm from "./smzdm";
 import { object, safeParse } from "valibot";
 
-const routers = [bilibili, taobao, weibo, xiaohongshu, douyin, wechat];
+const routers = [bilibili, taobao, weibo, xiaohongshu, douyin, wechat, smzdm];
 
 export const match = (url: string) => {
   const urlObject = URLParse(url, true);
