@@ -1,6 +1,6 @@
 import { ObjectSchema, object, Output } from "valibot";
 import type { Optional } from "utility-types";
-import { char, createRegExp, oneOrMore } from "magic-regexp/further-magic";
+import { char, createRegExp, oneOrMore, maybe, not, letter, digit, anyOf } from "magic-regexp/further-magic";
 import type { CheerioAPI } from "cheerio";
 
 type OptionalObjectSchema = ObjectSchema<{}> | undefined;
@@ -61,8 +61,10 @@ const createRegExpFromPath = (path: string) => {
   const regExpPart = segments
     .slice(1)
     .map((segment) => {
+      const legalChars = letter.or(digit).or(anyOf('-_.!~*\'()'));
+
       if (segment === "**") {
-        return [oneOrMore(char)];
+        return [oneOrMore(legalChars)];
       }
 
       if (!segment.startsWith(":")) {
@@ -70,7 +72,7 @@ const createRegExpFromPath = (path: string) => {
       }
 
       const paramName = segment.slice(1);
-      return ["/", oneOrMore(char).groupedAs(paramName)];
+      return ["/", oneOrMore(legalChars).groupedAs(paramName)];
     })
     .flat();
 

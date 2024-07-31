@@ -43,12 +43,10 @@ function bv2av(bvid: string) {
 }
 
 function getVideoLink(bvId: string, query: { t?: number; p?: number }) {
-  const timeQuery = stringify(query, false);
-  const timeQueryWithQuestionMark = timeQuery ? `?${timeQuery}` : '';
-  const timeQueryWithAndMark = timeQuery ? `&${timeQuery}` : '';
+  const timeQuery = stringify(query, true);
 
-  const fullLink = `https://www.bilibili.com/video/${bvId}${timeQueryWithQuestionMark}`;
-  const shortLink = `https://b23.tv/${bvId}${timeQueryWithQuestionMark}`;
+  const fullLink = `https://www.bilibili.com/video/${bvId}${timeQuery}`;
+  const shortLink = `https://b23.tv/${bvId}${timeQuery}`;
   const universalLink = `https://www.bilibili.com/video/${bvId}`;
 
   const mobileQuery = stringify(
@@ -59,7 +57,16 @@ function getVideoLink(bvId: string, query: { t?: number; p?: number }) {
     true
   );
   const customSchemeLink = `bilibili://video/${bv2av(bvId)}${mobileQuery}`;
-  const embedLink = `https://player.bilibili.com/player.html?isOutside=true&bvid=${bvId}${timeQueryWithAndMark}`;
+
+  const embedQuery = stringify(
+    {
+      isOutside: 'true',
+      bvid: bvId,
+      ...query,
+    },
+    true
+  );
+  const embedLink = `https://player.bilibili.com/player.html${embedQuery}`;
 
   return {
     fullLink,
