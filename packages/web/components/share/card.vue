@@ -23,47 +23,31 @@
           :src="data.embedLink" />
       </div>
     </div>
-    <div v-if="openGraphData?.description" class="opacity-90 px-4 text-base whitespace-pre-line break-words">
+    <div v-if="openGraphData?.description" class="w-full opacity-90 px-4 text-base whitespace-pre-line break-words">
       {{ openGraphData?.description }}
     </div>
-    <div class="mb-safe-offset-6" :style="{ height: `${actionPanelHeight}px` }"></div>
-  </div>
-  <div class="fixed left-0 right-0 bottom-safe-offset-6">
-    <div class="max-w-xl mx-auto px-6">
-      <div class="rounded-2xl bg-zinc-900 shadow-2xl dark:shadow-zinc-900 dark:border" ref="actionPanel" v-if="data">
-        <div class="text-sky-500 px-4 pt-3 text-center text-sm group">
-          <a class="inline" :href="data.fullLink" target="_blank" referrerpolicy="no-referrer">
-            <span class="break-words align-middle mr-1 group-hover:underline underline-offset-2">{{ data.fullLink
-              }}</span>
-            <i class="w-4 h-4 i-heroicons-outline-external-link align-middle"></i>
-          </a>
-        </div>
-        <div class="flex flex-row justify-between text-zinc-50 items-center">
-          <div class="p-2 pl-3 cursor-pointer active:bg-zinc-800 rounded-bl-2xl rounded-tr-2xl" @click="openPreview">
-            <i class="block w-8 h-8 i-material-symbols-light-eyeglasses-rounded"></i>
-          </div>
-          <div class="opacity-40 text-xs">原网页链接</div>
-          <div class="p-3 pl-4 cursor-pointer active:bg-zinc-800 rounded-tl-2xl rounded-br-2xl" @click="copyFullLink">
-            <i class="block w-6 h-6 i-material-symbols-light-content-copy-outline-rounded"></i>
-          </div>
-        </div>
+    <div class="mb-safe-offset-6 w-full opacity-0 pointer-events-none" v-if="data">
+      <div class="max-w-xl mx-auto px-6">
+        <ShareAction :full-link="data.fullLink" :iframe-link="data.iframeLink" />
       </div>
     </div>
   </div>
+  <div class="fixed left-0 right-0 bottom-safe-offset-6" v-if="data">
+    <div class="max-w-xl mx-auto px-6">
+      <ShareAction :full-link="data.fullLink" :iframe-link="data.iframeLink" />
+    </div>
+  </div>
   <ClientOnly>
-    <Toaster position="top-center" :theme="theme" :offset="toastOffset" />
-    <SharePreview :url="data.iframeLink ?? data.fullLink" v-model="isPreviewVisible" />
+    <Toaster position="top-center" :theme="theme" />
   </ClientOnly>
 </template>
 
 <script setup lang="ts">
 import {
-  useClipboard,
   usePreferredColorScheme,
   useElementBounding,
   useTitle,
 } from "@vueuse/core";
-import { UAParser } from "ua-parser-js";
 
 const props = defineProps<{
   url: string;
@@ -77,71 +61,8 @@ const { data: openGraphData } = await $client.scrape.useQuery({
   url: data.value?.fullLink,
 });
 
-const { copy } = useClipboard();
 const theme = usePreferredColorScheme();
-const isPreviewVisible = ref(false);
 const isPlayerVisible = ref(false);
-
-const actionPanel = ref<HTMLElement | null>(null);
-const { top, height: actionPanelHeight } = useElementBounding(actionPanel);
-const toastOffset = computed(() => `${top.value - 64}px`);
-
-const copyFullLink = () => {
-  copy(data.value?.fullLink!)
-    .then(() => {
-      $toast.success("链接已复制。", {
-        duration: 2000,
-      });
-    })
-    .catch(() => {
-      $toast.error("复制失败。可尝试手动复制。", {
-        duration: 2000,
-      });
-    });
-};
-
-const { userAgent } = useDevice();
-const isMajorAbove = (version: string | undefined, target: number) => {
-  if (!version) {
-    return false;
-  }
-
-  const [major] = version.split(".");
-  return Number(major) >= target;
-};
-const checkIsBrowserSupportsPreview = () => {
-  if (import.meta.server) {
-    return false;
-  }
-
-  const { browser, os, engine } = UAParser(userAgent);
-
-  if (browser.name === "Safari" || browser.name === "Mobile Safari") {
-    return isMajorAbove(os.version, 14);
-  }
-  if (browser.name === "WeChat" && os.name === "iOS") {
-    return isMajorAbove(os.version, 14);
-  }
-  if (engine.name === "Blink") {
-    return isMajorAbove(engine.version, 120);
-  }
-  if (engine.name === "Gecko") {
-    return isMajorAbove(engine.version, 115);
-  }
-
-  return false;
-};
-
-const openPreview = () => {
-  const isSupported = checkIsBrowserSupportsPreview();
-  if (isSupported) {
-    isPreviewVisible.value = true;
-  } else {
-    $toast.error("当前浏览器不支持无痕预览。", {
-      duration: 2000,
-    });
-  }
-};
 
 const openPlayer = () => {
   const isSupported = checkIsBrowserSupportsPreview();
