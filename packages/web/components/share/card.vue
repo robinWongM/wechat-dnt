@@ -1,14 +1,14 @@
 <template>
-  <div class="max-w-xl mx-auto flex flex-col gap-4 py-4" v-if="openGraphData">
-    <ShareLogo :name="openGraphData.config.id" class="mx-auto my-4" />
-    <div class="px-4 flex flex-col gap-2">
+  <div class="flex flex-col gap-4 py-4 max-w-xl mx-auto items-center" v-if="openGraphData">
+    <ShareLogo :name="openGraphData.config.id" class="my-4 mx-auto" />
+    <div class="px-4 flex flex-col gap-2 w-full">
       <h1 class="font-semibold text-xl">{{ openGraphData?.title }}</h1>
       <div v-if="openGraphData?.author" class="flex flex-row items-center gap-2">
         <img class="w-6 h-6 rounded-full" referrerpolicy="no-referrer" :src="openGraphData.author.avatar" />
         <span class="opacity-80">{{ openGraphData?.author.name }}</span>
       </div>
     </div>
-    <div class="flex flex-col overflow-hidden" v-if="openGraphData?.images?.[0]">
+    <div class="max-w-[34rem] w-full flex flex-col overflow-hidden" v-if="openGraphData?.images?.[0]">
       <div class="w-full relative overflow-hidden" style="container-type: inline-size">
         <img :src="openGraphData.images[0]" alt="" referrerpolicy="no-referrer"
           class="w-full max-h-[100cqw] object-contain pointer-events-none" />
@@ -181,7 +181,7 @@ if (openGraphData.value) {
 
   const desc = [
     `✨ 分享自 ${name}`,
-    author ? `🧑‍💻 ${authorLabel}: ${author.name}` : "",
+    author ? `🧑‍💻 ${authorLabel}：${author.name}` : "",
     description ? `📝 ${description.replaceAll(/\s+/g, " ")}` : "",
   ]
     .filter((item) => item)
