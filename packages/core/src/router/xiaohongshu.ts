@@ -24,6 +24,8 @@ const extractor: Extractor = async ({ fullLink }, { fetch, loadHtml }) => {
   const module = parseModule(initialData, { range: true });
 
   const note = pickNested(module.body[0].declaration , "note", "noteDetailMap", "*", "note", "desc")?.value || '';
+  const name = pickNested(module.body[0].declaration , "note", "noteDetailMap", "*", "note", "user", "nickname")?.value || '';
+  const avatar = pickNested(module.body[0].declaration , "note", "noteDetailMap", "*", "note", "user", "avatar")?.value || '';
 
   const title = $("#detail-title").text();
   const description = note.replaceAll(/#(.*?)\[话题\]#/g, "#$1 ");
@@ -33,6 +35,10 @@ const extractor: Extractor = async ({ fullLink }, { fetch, loadHtml }) => {
     title,
     description,
     images: image ? [image] : [],
+    author: {
+      name,
+      avatar,
+    },
   };
 };
 
