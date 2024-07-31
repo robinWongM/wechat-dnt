@@ -6,6 +6,11 @@ const postLink = (postId: string) => ({
   universalLink: `https://www.smzdm.com/p/${postId}`,
 });
 
+const communityLink = (postId: string) => ({
+  fullLink: `https://post.smzdm.com/p/${postId}`,
+  universalLink: `https://post.smzdm.com/p/${postId}`,
+});
+
 export default defineRouter(
   {
     id: "smzdm",
@@ -18,12 +23,23 @@ export default defineRouter(
         "www.smzdm.com",
         "smzdm.com",
         "m.smzdm.com",
+      ],
+      path: "/p/:postId",
+      param: object({ postId: string() }),
+    },
+    sanitizer: ({ param: { postId } }) => postLink(postId),
+  }),
+
+  defineHandler({
+    pattern: {
+      host: [
         "post.smzdm.com",
         "post.m.smzdm.com",
       ],
       path: "/p/:postId",
       param: object({ postId: string() }),
     },
-    sanitizer: ({ param: { postId } }) => postLink(postId),
-  })
+    sanitizer: ({ param: { postId } }) => communityLink(postId),
+  }),
+
 );
