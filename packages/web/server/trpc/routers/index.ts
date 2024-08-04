@@ -1,37 +1,95 @@
 import { z } from "zod";
 import { publicProcedure, router } from "../trpc";
-import { sanitize, match } from "@dnt/core";
+import { sanitize, match, isShortLink, extractLink } from "@dnt/core";
 import { createHash } from "node:crypto";
 import og from "open-graph-scraper";
-import { load } from 'cheerio';
+import { load } from "cheerio";
 
 const defaultHeaders = {
-  'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7',
-  'Accept-Encoding': 'gzip, deflate, br, zstd',
-  'Accept-Language': 'zh-CN,zh;q=0.9,en;q=0.8,en-GB;q=0.7,en-US;q=0.6',
-  'Cache-Control': 'no-cache',
-  'Pragma': 'no-cache',
-  'Priority': 'u=0, i',
-  'Sec-Ch-Ua': '"Not/A)Brand";v="8", "Chromium";v="126", "Microsoft Edge";v="126"',
-  'Sec-Ch-Ua-Mobile': '?0',
-  'Sec-Ch-Ua-Platform': '"Windows"',
-  'Sec-Fetch-Dest': 'document',
-  'Sec-Fetch-Mode': 'navigate',
-  'Sec-Fetch-Site': 'none',
-  'Sec-Fetch-User': '?1',
-  'Upgrade-Insecure-Requests': '1',
-  'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36 Edg/126.0.0.0'
+  Accept:
+    "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7",
+  "Accept-Encoding": "gzip, deflate, br, zstd",
+  "Accept-Language": "zh-CN,zh;q=0.9,en;q=0.8,en-GB;q=0.7,en-US;q=0.6",
+  "Cache-Control": "no-cache",
+  Pragma: "no-cache",
+  Priority: "u=0, i",
+  "Sec-Ch-Ua":
+    '"Not/A)Brand";v="8", "Chromium";v="126", "Microsoft Edge";v="126"',
+  "Sec-Ch-Ua-Mobile": "?0",
+  "Sec-Ch-Ua-Platform": '"Windows"',
+  "Sec-Fetch-Dest": "document",
+  "Sec-Fetch-Mode": "navigate",
+  "Sec-Fetch-Site": "none",
+  "Sec-Fetch-User": "?1",
+  "Upgrade-Insecure-Requests": "1",
+  "User-Agent":
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36 Edg/126.0.0.0",
+};
+
+const resolveShortLink = async (
+  link: string,
+  maxRedirectTimes = 10
+): Promise<string> => {
+  if (maxRedirectTimes <= 0) {
+    return link;
+  }
+
+  if (isShortLink(link)) {
+    const resp = await fetch(link, {
+      redirect: "manual",
+      headers: {
+        "User-Agent":
+          "Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Mobile/15E148 Safari/604.1",
+      },
+    });
+
+    const redirected = resp.headers.get("location");
+    if (redirected && isShortLink(redirected)) {
+      return resolveShortLink(redirected, maxRedirectTimes - 1);
+    }
+
+    return redirected || link;
+  }
+
+  return link;
 };
 
 export const appRouter = router({
+  resolveShortLink: publicProcedure
+    .input(
+      z.object({
+        url: z.string(),
+        maxRedirectTimes: z
+          .number()
+          .int()
+          .min(0)
+          .max(10)
+          .optional()
+          .default(10),
+      })
+    )
+    .query(async ({ input: { url, maxRedirectTimes } }) =>
+      resolveShortLink(url, maxRedirectTimes)
+    ),
+
   sanitize: publicProcedure
     .input(
       z.object({
         text: z.string(),
       })
     )
-    .query(({ input }) => {
-      return sanitize(input.text);
+    .query(async ({ input: { text } }) => {
+      const url = extractLink(text);
+      if (!url) {
+        throw createError("no url found");
+      }
+
+      const finalUrl = await resolveShortLink(url);
+      if (!finalUrl) {
+        throw createError("failed to resolve link");
+      }
+
+      return sanitize(finalUrl);
     }),
 
   scrape: publicProcedure
@@ -46,25 +104,26 @@ export const appRouter = router({
         throw createError("unsupported url");
       }
 
-      const ofetch = (url: string, init?: RequestInit) => fetch(url, {
-        ...init,
-        headers: {
-          ...defaultHeaders,
-        },
-      });
+      const ofetch = (url: string, init?: RequestInit) =>
+        fetch(url, {
+          ...init,
+          headers: {
+            ...defaultHeaders,
+          },
+        });
       const loadHtml = (html: string) => {
         return load(html, {
           xml: {
             xmlMode: false,
-          }
+          },
         });
-      }
+      };
       const result = await matchResult.extract({ fetch: ofetch, loadHtml });
 
       return {
         ...result,
         config: matchResult.config,
-      }
+      };
     }),
 
   getWxConfig: publicProcedure

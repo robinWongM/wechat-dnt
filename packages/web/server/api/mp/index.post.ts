@@ -25,34 +25,6 @@ const eventSchema = string()
   );
 const trpcCaller = createCallerFactory()(appRouter)({});
 
-const resolveShortLink = async (
-  link: string,
-  maxRedirectTimes = 10
-): Promise<string> => {
-  if (maxRedirectTimes <= 0) {
-    return link;
-  }
-
-  if (isShortLink(link)) {
-    const resp = await fetch(link, {
-      redirect: "manual",
-      headers: {
-        "User-Agent":
-          "Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Mobile/15E148 Safari/604.1",
-      },
-    });
-
-    const redirected = resp.headers.get("location");
-    if (redirected && isShortLink(redirected)) {
-      return resolveShortLink(redirected, maxRedirectTimes - 1);
-    }
-
-    return redirected || link;
-  }
-
-  return link;
-};
-
 const useMpMessageQueue = (username: string) => {
   let promise = Promise.resolve();
 
@@ -85,7 +57,7 @@ const handleMpEvent = async (event: z.infer<typeof eventSchema>) => {
       void send(`你发送的 URL 是: \n${originalLink}`);
     }
 
-    const link = await resolveShortLink(originalLink);
+    const link = await trpcCaller.resolveShortLink({ url: originalLink });
     if (link !== originalLink) {
       void send(`重定向至：\n${link}`);
     }
