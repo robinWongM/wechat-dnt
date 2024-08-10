@@ -3,16 +3,16 @@
     <ShareLogo :name="data.config.id" class="my-4 mx-auto" />
     <div class="px-4 flex flex-col gap-2 w-full">
       <h1 class="font-semibold text-xl">{{ data?.title }}</h1>
-      <div v-if="data?.author" class="flex flex-row items-center gap-2">
-        <img class="w-6 h-6 rounded-full" referrerpolicy="no-referrer" :src="data.author.avatar" />
-        <span class="opacity-80">{{ data?.author.name }}</span>
+      <div v-if="data?.authorName" class="flex flex-row items-center gap-2">
+        <img v-if="data.authorAvatar" class="w-6 h-6 rounded-full" referrerpolicy="no-referrer" :src="data.authorAvatar" />
+        <span class="opacity-80">{{ data.authorName }}</span>
       </div>
     </div>
-    <div class="max-w-[34rem] w-full flex flex-col overflow-hidden" v-if="data?.images?.[0]">
+    <div class="max-w-[34rem] w-full flex flex-col overflow-hidden" v-if="data?.image">
       <div class="w-full relative overflow-hidden" style="container-type: inline-size">
-        <img :src="data.images[0]" alt="" referrerpolicy="no-referrer"
+        <img :src="data.image" alt="" referrerpolicy="no-referrer"
           class="w-full max-h-[100cqw] object-contain pointer-events-none" />
-        <img :src="data.images[0]" alt="" referrerpolicy="no-referrer"
+        <img :src="data.image" alt="" referrerpolicy="no-referrer"
           class="absolute top-0 left-0 right-0 bottom-0 -z-20 object-fill scale-125 blur-3xl" />
         <div v-if="embedLink"
           class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full bg-black bg-opacity-20 cursor-pointer backdrop-blur-xl backdrop-contrast-150"

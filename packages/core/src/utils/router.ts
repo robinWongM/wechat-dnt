@@ -1,6 +1,6 @@
 import { ObjectSchema, object, Output } from "valibot";
 import type { Optional } from "utility-types";
-import { char, createRegExp, oneOrMore, maybe, not, letter, digit, anyOf } from "magic-regexp/further-magic";
+import { char, createRegExp, oneOrMore, letter, digit, anyOf, exactly } from "magic-regexp/further-magic";
 import type { CheerioAPI } from "cheerio";
 
 type OptionalObjectSchema = ObjectSchema<{}> | undefined;
@@ -41,12 +41,9 @@ type ExtractMetadata = {
 type ExtractorOutput = {
   title: string;
   description?: string;
-  author?: {
-    name: string;
-    avatar?: string;
-  };
-  metadata?: ExtractMetadata[];
-  images: string[];
+  authorName?: string;
+  authorAvatar?: string;
+  image?: string;
 };
 export type Extractor = (
   input: SanitizerOutput,
@@ -76,7 +73,7 @@ const createRegExpFromPath = (path: string) => {
     })
     .flat();
 
-  return createRegExp(...regExpPart);
+  return createRegExp(exactly('').at.lineStart(), ...regExpPart);
 };
 
 const defaultExtractor: Extractor = async (

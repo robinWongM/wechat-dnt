@@ -160,13 +160,9 @@ export default defineRouter(
       return {
         title,
         description,
-        images: [
-          pic.replace(/^http:/, "https:"),
-        ],
-        author: {
-          name,
-          avatar: face,
-        },
+        image: pic.replace(/^http:/, "https:"),
+        authorName: name,
+        authorAvatar: face,
         metadata: [
           { label: "UP 主", icon: "", value: name },
           // {

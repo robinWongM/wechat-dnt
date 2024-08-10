@@ -74,7 +74,7 @@ export default defineRouter(
       return {
         title,
         description,
-        images,
+        image: images[0],
       };
     },
   }),

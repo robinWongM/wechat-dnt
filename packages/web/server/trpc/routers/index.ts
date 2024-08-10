@@ -4,6 +4,8 @@ import { sanitize, match, isShortLink, extractLink } from "@dnt/core";
 import { createHash } from "node:crypto";
 import og from "open-graph-scraper";
 import { load } from "cheerio";
+import { previewCache } from "~/server/schema";
+import { eq } from "drizzle-orm";
 
 const defaultHeaders = {
   Accept:
@@ -104,6 +106,23 @@ export const appRouter = router({
         throw createError("unsupported url");
       }
 
+      const sanitized = matchResult.sanitize();
+
+      const cached = await db.query.previewCache.findFirst({
+        where: eq(previewCache.fullLink, sanitized.fullLink),
+      });
+      if (cached) {
+        console.log('using cache!');
+        return {
+          title: cached.title,
+          description: cached.description,
+          authorName: cached.authorName,
+          authorAvatar: cached.authorAvatar,
+          image: cached.image,
+          config: matchResult.config,
+        };
+      }
+
       const ofetch = (url: string, init?: RequestInit) =>
         fetch(url, {
           ...init,
@@ -119,6 +138,20 @@ export const appRouter = router({
         });
       };
       const result = await matchResult.extract({ fetch: ofetch, loadHtml });
+      if (!result) {
+        throw createError("failed to extract data");
+      }
+
+      await db.insert(previewCache)
+        .values({
+          fullLink: sanitized.fullLink,
+          title: result.title,
+          description: result.description,
+          image: result.image,
+          authorName: result.authorName,
+          authorAvatar: result.authorAvatar,
+        })
+        .onConflictDoNothing();
 
       return {
         ...result,

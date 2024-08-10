@@ -34,11 +34,9 @@ const extractor: Extractor = async ({ fullLink }, { fetch, loadHtml }) => {
   return {
     title,
     description,
-    images: image ? [image] : [],
-    author: {
-      name,
-      avatar,
-    },
+    image,
+    authorName: name,
+    authorAvatar: avatar,
   };
 };
 
