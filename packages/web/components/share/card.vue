@@ -74,7 +74,7 @@ const shareData = ref({
 if (data.value) {
   const {
     config: { id, name },
-    author,
+    authorName,
     description,
   } = data.value;
 
@@ -82,7 +82,7 @@ if (data.value) {
 
   const desc = [
     `✨ 分享自 ${name}`,
-    author ? `🧑‍💻 ${authorLabel}：${author.name} ` : "",
+    authorName ? `🧑‍💻 ${authorLabel}：${authorName} ` : "",
     description ? `📝 ${description.replaceAll(/\s+/g, " ")}` : "",
   ]
     .filter((item) => item)
