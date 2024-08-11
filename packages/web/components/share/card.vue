@@ -82,7 +82,7 @@ if (data.value) {
 
   const desc = [
     `✨ 分享自 ${name}`,
-    author ? `🧑‍💻 ${authorLabel}：${author.name}` : "",
+    author ? `🧑‍💻 ${authorLabel}：${author.name} ` : "",
     description ? `📝 ${description.replaceAll(/\s+/g, " ")}` : "",
   ]
     .filter((item) => item)
@@ -91,7 +91,7 @@ if (data.value) {
 
   shareData.value.title = data.value?.title || "";
   shareData.value.description = desc;
-  shareData.value.imageUrl = data.value?.images?.[0] || defaultShareImageUrl;
+  shareData.value.imageUrl = data.value?.image || defaultShareImageUrl;
 }
 
 useTitle(shareData.value.title);
