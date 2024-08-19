@@ -43,6 +43,10 @@ function bv2av(bvid: string) {
 }
 
 function getVideoLink(bvId: string, query: { t?: number; p?: number }) {
+  if (query.p === 1) {
+    delete query.p;
+  }
+
   const timeQuery = stringify(query, true);
 
   const fullLink = `https://www.bilibili.com/video/${bvId}${timeQuery}`;
