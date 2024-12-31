@@ -11,7 +11,7 @@ COPY . ./
 RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --offline --frozen-lockfile
 RUN pnpm run --filter=web build
 
-FROM cgr.dev/chainguard/node-lts:latest AS web
+FROM cgr.dev/chainguard/node:latest AS web
 COPY --from=build /build/packages/web/.output /prod/web
 WORKDIR /prod/web
 EXPOSE 3000
