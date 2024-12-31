@@ -7,6 +7,7 @@ const SHORT_LINK_DOMAINS = [
   'm.tb.cn',
   't.cn',
   'v.douyin.com',
+  'bili2233.cn',
 ];
 
 export const isShortLink = (url: string) => {
