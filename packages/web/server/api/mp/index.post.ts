@@ -50,6 +50,7 @@ const handleMpEvent = async (event: z.infer<typeof eventSchema>) => {
     const originalLink = extractLink(`${linkText}`);
 
     if (!originalLink) {
+      console.log('originalLink not found', event);
       return send("无法识别链接。");
     }
 
