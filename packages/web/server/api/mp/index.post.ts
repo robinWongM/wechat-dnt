@@ -53,10 +53,7 @@ export default defineEventHandler(async (event) => {
   }
 
   if (data) {
-    console.info("[mp] event parsed", {
-      msgType: data.MsgType,
-      event: data.Event ?? null,
-    });
+    console.info("[mp] event parsed", data);
     void handleMpEvent(data).catch((handleError) => {
       console.error("[mp] event handling failed", {
         msgType: data.MsgType,
