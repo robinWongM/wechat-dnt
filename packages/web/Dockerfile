@@ -1,9 +1,5 @@
 FROM oven/bun:1 as build
 WORKDIR /app
-RUN apt-get update \
-  && apt-get install -y --no-install-recommends python3 make g++ \
-  && rm -rf /var/lib/apt/lists/*
-RUN bun add -g node-gyp
 COPY package.json bun.lock /app/
 COPY packages/core/package.json /app/packages/core/package.json
 COPY packages/uni-dnt/package.json /app/packages/uni-dnt/package.json
@@ -13,7 +9,8 @@ COPY . /app
 RUN bun run --cwd packages/web build
 
 FROM oven/bun:1 as prod
-WORKDIR /app
 COPY --from=build /app/packages/web/.output /app/.output
+WORKDIR /app/.output/server
+RUN --mount=type=cache,id=bun,target=/root/.bun/install/cache bun install --production
 EXPOSE 3000/tcp
-CMD ["bun", "/app/.output/server/index.mjs"]
+CMD ["bun", "index.mjs"]
