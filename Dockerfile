@@ -10,6 +10,7 @@ RUN bun run --cwd packages/web build
 
 FROM oven/bun:1 AS web
 COPY --from=build /build/packages/web/.output /prod/web
+COPY --from=build /build/packages/web/server/drizzle /prod/web/server/drizzle
 WORKDIR /prod/web/server
 RUN bun install --production
 EXPOSE 3000
