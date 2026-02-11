@@ -122,6 +122,7 @@ export const qySendKfTextMessage = async (
       console.info("[qy][send_msg] sent successfully", {
         openKfid,
         toUserSuffix: toUser.slice(-6),
+        rawResponse: resp,
       });
       return resp;
     });
