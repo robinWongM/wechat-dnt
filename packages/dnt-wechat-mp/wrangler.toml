@@ -1,3 +1,0 @@
-name = "dnt-wechat-mp"
-compatibility_date = "2023-12-01"
-compatibility_flags = [ "nodejs_compat" ]

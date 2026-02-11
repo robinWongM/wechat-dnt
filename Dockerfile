@@ -1,17 +1,15 @@
-FROM node:22 AS build
-ENV PNPM_HOME="/pnpm"
-ENV PATH="$PNPM_HOME:$PATH"
+FROM oven/bun:1 AS build
 WORKDIR /build
-COPY package.json ./
-RUN corepack enable
-COPY .npmrc pnpm-lock.yaml pnpm-workspace.yaml ./
-RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm fetch
+COPY package.json bun.lock ./
+COPY packages/core/package.json ./packages/core/package.json
+COPY packages/uni-dnt/package.json ./packages/uni-dnt/package.json
+COPY packages/web/package.json ./packages/web/package.json
+RUN --mount=type=cache,id=bun,target=/root/.bun/install/cache bun install --frozen-lockfile
 COPY . ./
-RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --offline --frozen-lockfile
-RUN pnpm run --filter=web build
+RUN bun run --cwd packages/web build
 
-FROM node:22-slim AS web
+FROM oven/bun:1 AS web
 COPY --from=build /build/packages/web/.output /prod/web
 WORKDIR /prod/web
 EXPOSE 3000
-CMD ["server/index.mjs"]
+CMD ["bun", "server/index.mjs"]

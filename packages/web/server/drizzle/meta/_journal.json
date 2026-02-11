@@ -8,6 +8,13 @@
       "when": 1723316641935,
       "tag": "0000_left_amphibian",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "6",
+      "when": 1770806009352,
+      "tag": "0001_giant_karen_page",
+      "breakpoints": true
     }
   ]
 }

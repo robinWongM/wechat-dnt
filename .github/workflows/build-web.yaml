@@ -8,8 +8,7 @@ on:
       - 'packages/web/**'
       - 'packages/core/**'
       - 'package.json'
-      - 'pnpm-workspace.yaml'
-      - 'pnpm-lock.yaml'
+      - 'bun.lock'
       - 'Dockerfile'
       - '.github/workflows/build-web.yaml'
   workflow_dispatch:

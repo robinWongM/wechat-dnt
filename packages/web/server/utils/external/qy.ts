@@ -1,21 +1,65 @@
 const QY_ACCESS_TOKEN_ENDPOINT =
   "https://qyapi.weixin.qq.com/cgi-bin/gettoken";
-const MP_SEND_TEXT_ENDPOINT =
-  "https://api.weixin.qq.com/cgi-bin/message/custom/send";
+const QY_KF_SEND_TEXT_ENDPOINT =
+  "https://qyapi.weixin.qq.com/cgi-bin/kf/send_msg";
+const QY_KF_SYNC_MSG_ENDPOINT = "https://qyapi.weixin.qq.com/cgi-bin/kf/sync_msg";
 
 let accessToken = "";
 let expiresAt = 0;
 
 let refreshAccessTokenPromise: Promise<string> | null = null;
 
-const useQyAccessToken = () => {
+type QyResponseBase = {
+  errcode: number;
+  errmsg: string;
+};
+
+type QyTokenResponse = QyResponseBase & {
+  access_token: string;
+  expires_in: number;
+};
+
+type QySyncMsgRecord = {
+  msgid?: string;
+  msgtype: string;
+  origin?: number;
+  open_kfid?: string;
+  external_userid?: string;
+  text?: {
+    content?: string;
+  };
+  link?: {
+    url?: string;
+  };
+  event?: {
+    event_type?: string;
+    open_kfid?: string;
+    external_userid?: string;
+  };
+};
+
+export type QyKfSyncMsgResponse = QyResponseBase & {
+  next_cursor: string;
+  has_more: 0 | 1;
+  msg_list: QySyncMsgRecord[];
+};
+
+const assertQySuccess = <T extends QyResponseBase>(resp: T) => {
+  if (resp.errcode !== 0) {
+    throw createError({
+      status: 502,
+      message: `qy api error: ${resp.errmsg} (${resp.errcode})`,
+    });
+  }
+  return resp;
+};
+
+export const useQyAccessToken = () => {
   if (Date.now() < expiresAt - 60 * 1000) {
-    console.log("Using cached access token");
-    return accessToken;
+    return Promise.resolve(accessToken);
   }
 
   if (!refreshAccessTokenPromise) {
-    console.log("Refreshing access token");
     const {
       qy: { corpId, corpSecret },
     } = useRuntimeConfig();
@@ -26,15 +70,11 @@ const useQyAccessToken = () => {
 
     refreshAccessTokenPromise = fetch(url)
       .then((resp) => resp.json())
-      .then((resp: { access_token: string; expires_in: number }) => {
-        console.log("Access token refreshed", resp);
+      .then((resp: QyTokenResponse) => {
+        assertQySuccess(resp);
         accessToken = resp.access_token;
         expiresAt = Date.now() + resp.expires_in * 1000;
         return accessToken;
-      })
-      .catch((err) => {
-        console.error(err);
-        throw err;
       })
       .finally(() => {
         refreshAccessTokenPromise = null;
@@ -44,34 +84,63 @@ const useQyAccessToken = () => {
   return refreshAccessTokenPromise;
 };
 
-export const qySendTextMessage = async (toUser: string, content: string) => {
-  console.log("Sending text message to", toUser, ":", content);
-
+export const qySendKfTextMessage = async (
+  toUser: string,
+  openKfid: string,
+  content: string
+) => {
   const accessToken = await useQyAccessToken();
   const payload = {
     touser: toUser,
+    open_kfid: openKfid,
     msgtype: "text",
     text: {
       content,
     },
   };
 
-  return fetch(`${MP_SEND_TEXT_ENDPOINT}?access_token=${accessToken}`, {
+  return fetch(`${QY_KF_SEND_TEXT_ENDPOINT}?access_token=${accessToken}`, {
     method: "POST",
     body: JSON.stringify(payload),
     headers: {
       "Content-Type": "application/json",
     },
   })
-    .then((resp) => {
-      console.log("API response:", resp.status, resp.statusText);
-      return resp.json();
-    })
-    .then((resp) => {
-      console.log("API response body:", resp);
-    })
-    .catch((err) => {
-      console.error(err);
-      throw err;
-    });
+    .then((resp) => resp.json())
+    .then((resp: QyResponseBase) => assertQySuccess(resp));
+};
+
+export const qySyncMsg = async (input: {
+  openKfid: string;
+  cursor?: string | null;
+  token?: string;
+  limit?: number;
+}) => {
+  const accessToken = await useQyAccessToken();
+  const payload: {
+    open_kfid: string;
+    cursor?: string;
+    token?: string;
+    limit?: number;
+  } = {
+    open_kfid: input.openKfid,
+    limit: input.limit ?? 500,
+  };
+
+  if (input.cursor) {
+    payload.cursor = input.cursor;
+  }
+  if (input.token) {
+    payload.token = input.token;
+  }
+
+  return fetch(`${QY_KF_SYNC_MSG_ENDPOINT}?access_token=${accessToken}`, {
+    method: "POST",
+    body: JSON.stringify(payload),
+    headers: {
+      "Content-Type": "application/json",
+    },
+  })
+    .then((resp) => resp.json())
+    .then((resp: QyKfSyncMsgResponse) => assertQySuccess(resp));
 };

@@ -26,6 +26,12 @@ export default defineNuxtConfig({
     qy: {
       corpId: "",
       corpSecret: "",
+      token: "",
+      aesKey: "",
+      openKfid: "",
+    },
+    features: {
+      kfEnabled: false,
     },
     wxa: {
       appId: "",

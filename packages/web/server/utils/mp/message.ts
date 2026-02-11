@@ -4,8 +4,6 @@ const MP_SEND_TEXT_ENDPOINT =
   "https://api.weixin.qq.com/cgi-bin/message/custom/send";
 
 export const mpSendTextMessage = async (toUser: string, content: string) => {
-  console.log("Sending text message to", toUser, ":", content);
-
   const accessToken = await useMpAccessToken();
   const payload = {
     touser: toUser,
@@ -22,13 +20,7 @@ export const mpSendTextMessage = async (toUser: string, content: string) => {
       "Content-Type": "application/json",
     },
   })
-    .then((resp) => {
-      console.log("API response:", resp.status, resp.statusText);
-      return resp.json();
-    })
-    .then((resp) => {
-      console.log("API response body:", resp);
-    })
+    .then((resp) => resp.json())
     .catch((err) => {
       console.error(err);
       throw err;

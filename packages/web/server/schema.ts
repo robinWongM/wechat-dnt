@@ -9,3 +9,10 @@ export const previewCache = sqliteTable('previewCache', {
   authorName: text('authorName'),
   authorAvatar: text('authorAvatar'),
 });
+
+export const kfSyncCursor = sqliteTable('kfSyncCursor', {
+  id: integer('id').primaryKey(),
+  openKfid: text('openKfid').notNull().unique(),
+  cursor: text('cursor'),
+  updatedAt: integer('updatedAt').notNull(),
+});

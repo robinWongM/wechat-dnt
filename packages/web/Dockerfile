@@ -1,12 +1,15 @@
-FROM node:20 as build
+FROM oven/bun:1 as build
 WORKDIR /app
-COPY packages/web/package.json /app
-RUN corepack enable pnpm && pnpm install
+COPY package.json bun.lock /app/
+COPY packages/core/package.json /app/packages/core/package.json
+COPY packages/uni-dnt/package.json /app/packages/uni-dnt/package.json
+COPY packages/web/package.json /app/packages/web/package.json
+RUN --mount=type=cache,id=bun,target=/root/.bun/install/cache bun install --frozen-lockfile
 COPY . /app
-RUN cd packages/web && pnpm run build
+RUN bun run --cwd packages/web build
 
-FROM cgr.dev/chainguard/node:latest as prod
+FROM oven/bun:1 as prod
 WORKDIR /app
-COPY --from=build /app/packages/web/.output/server /app/.output/server
+COPY --from=build /app/packages/web/.output /app/.output
 EXPOSE 3000/tcp
-CMD ["/app/.output/server/index.mjs"]
+CMD ["bun", "/app/.output/server/index.mjs"]
