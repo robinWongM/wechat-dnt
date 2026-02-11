@@ -12,6 +12,15 @@ on:
       - 'Dockerfile'
       - '.github/workflows/build-web.yaml'
   workflow_dispatch:
+    inputs:
+      enable_ssh:
+        description: 'Open SSH tunnel (tmate) for interactive debug'
+        required: false
+        default: 'false'
+        type: choice
+        options:
+          - 'false'
+          - 'true'
 
 env:
   REGISTRY: ghcr.io
@@ -28,6 +37,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - name: Start SSH debug tunnel (tmate)
+        if: github.event_name == 'workflow_dispatch' && inputs.enable_ssh == 'true'
+        uses: mxschmitt/action-tmate@v3
+        with:
+          limit-access-to-actor: true
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
       - name: Login to GitHub Container Registry
