@@ -23,11 +23,14 @@ const runMigrations = async () => {
     });
   }
 
+  console.info("[db] running migrations", { folder });
   await migrate(db, { migrationsFolder: folder });
+  console.info("[db] migrations complete");
 };
 
 export default defineNitroPlugin(async () => {
   if (!migrationPromise) {
+    console.info("[db] migration plugin initialized");
     migrationPromise = runMigrations();
   }
 

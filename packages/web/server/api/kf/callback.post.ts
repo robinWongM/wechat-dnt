@@ -25,12 +25,14 @@ export default defineEventHandler(async (event) => {
   } = useRuntimeConfig(event);
 
   if (!kfEnabled) {
+    console.info("[kf][callback] disabled, skip request");
     throw createError({
       status: 404,
       message: "not found",
     });
   }
 
+  console.info("[kf][callback] received callback request");
   const message = await useQyEncryptedMessage(event);
   const parsed = callbackEventSchema.safeParse(message);
   if (!parsed.success) {
@@ -47,6 +49,12 @@ export default defineEventHandler(async (event) => {
     console.error("Missing open_kfid for KF sync");
     return "success";
   }
+
+  console.info("[kf][callback] enqueue sync", {
+    event: parsed.data.Event,
+    hasToken: Boolean(parsed.data.Token),
+    openKfid: targetOpenKfid,
+  });
 
   void enqueueKfSync({
     openKfid: targetOpenKfid,

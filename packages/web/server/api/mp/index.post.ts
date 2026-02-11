@@ -44,6 +44,7 @@ const handleMpEvent = async (event: z.infer<typeof eventSchema>) => {
 };
 
 export default defineEventHandler(async (event) => {
+  console.info("[mp] callback received");
   const message = await useMpEncryptedMessage(event);
 
   const { data, error, success } = eventSchema.safeParse(message);
@@ -52,6 +53,10 @@ export default defineEventHandler(async (event) => {
   }
 
   if (data) {
+    console.info("[mp] event parsed", {
+      msgType: data.MsgType,
+      event: data.Event ?? null,
+    });
     void handleMpEvent(data);
   }
 

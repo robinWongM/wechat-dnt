@@ -56,6 +56,7 @@ const assertQySuccess = <T extends QyResponseBase>(resp: T) => {
 
 export const useQyAccessToken = () => {
   if (Date.now() < expiresAt - 60 * 1000) {
+    console.info("[qy][token] using cached token");
     return Promise.resolve(accessToken);
   }
 
@@ -74,6 +75,9 @@ export const useQyAccessToken = () => {
         assertQySuccess(resp);
         accessToken = resp.access_token;
         expiresAt = Date.now() + resp.expires_in * 1000;
+        console.info("[qy][token] refreshed token", {
+          expiresIn: resp.expires_in,
+        });
         return accessToken;
       })
       .finally(() => {
@@ -89,6 +93,12 @@ export const qySendKfTextMessage = async (
   openKfid: string,
   content: string
 ) => {
+  console.info("[qy][send_msg] sending text response", {
+    openKfid,
+    toUserSuffix: toUser.slice(-6),
+    contentLength: content.length,
+  });
+
   const accessToken = await useQyAccessToken();
   const payload = {
     touser: toUser,
@@ -107,7 +117,14 @@ export const qySendKfTextMessage = async (
     },
   })
     .then((resp) => resp.json())
-    .then((resp: QyResponseBase) => assertQySuccess(resp));
+    .then((resp: QyResponseBase) => {
+      assertQySuccess(resp);
+      console.info("[qy][send_msg] sent successfully", {
+        openKfid,
+        toUserSuffix: toUser.slice(-6),
+      });
+      return resp;
+    });
 };
 
 export const qySyncMsg = async (input: {
@@ -116,6 +133,13 @@ export const qySyncMsg = async (input: {
   token?: string;
   limit?: number;
 }) => {
+  console.info("[qy][sync_msg] requesting batch", {
+    openKfid: input.openKfid,
+    hasCursor: Boolean(input.cursor),
+    hasToken: Boolean(input.token),
+    limit: input.limit ?? 500,
+  });
+
   const accessToken = await useQyAccessToken();
   const payload: {
     open_kfid: string;
@@ -142,5 +166,14 @@ export const qySyncMsg = async (input: {
     },
   })
     .then((resp) => resp.json())
-    .then((resp: QyKfSyncMsgResponse) => assertQySuccess(resp));
+    .then((resp: QyKfSyncMsgResponse) => {
+      assertQySuccess(resp);
+      console.info("[qy][sync_msg] batch received", {
+        openKfid: input.openKfid,
+        hasMore: resp.has_more,
+        msgCount: resp.msg_list.length,
+        nextCursorChanged: Boolean(resp.next_cursor && resp.next_cursor !== input.cursor),
+      });
+      return resp;
+    });
 };

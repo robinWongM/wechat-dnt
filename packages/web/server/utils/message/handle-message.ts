@@ -15,16 +15,22 @@ export const handleIncomingMessage = async (
   intent: IncomingIntent,
   send: SendMessage
 ) => {
+  console.info("[message] start handling", {
+    intent: intent.type,
+  });
+
   if (intent.type === "subscribe") {
     await send(
       "感谢你关注「别瞅着我」。\n\n发送任意链接 / 微信分享卡片至本公众号，可去除恼人的跟踪参数。"
     );
+    console.info("[message] subscribe handled");
     return;
   }
 
   const source = intent.type === "text" ? intent.content : intent.url;
   const originalLink = extractLink(source);
   if (!originalLink) {
+    console.info("[message] link extraction failed");
     await send("无法识别链接。");
     return;
   }
@@ -35,17 +41,20 @@ export const handleIncomingMessage = async (
 
   const link = await trpcCaller.resolveShortLink({ url: originalLink });
   if (link !== originalLink) {
+    console.info("[message] short link expanded");
     await send(`重定向至：\n${link}`);
   }
 
   const matchResult = sanitize(link);
   if (!matchResult) {
+    console.info("[message] unsupported link");
     await send("暂不支持此链接。");
     return;
   }
 
   const result = await trpcCaller.scrape({ url: matchResult.fullLink });
   if (!result) {
+    console.info("[message] scrape failed");
     await send("获取链接信息失败。");
     return;
   }
@@ -61,4 +70,5 @@ export const handleIncomingMessage = async (
     shareUrl.searchParams.set(key, parsedUrl.searchParams.get(key)!);
   }
   await send(`<a href="${shareUrl.toString()}">轻触此处创建分享卡片</a>`);
+  console.info("[message] handled successfully");
 };

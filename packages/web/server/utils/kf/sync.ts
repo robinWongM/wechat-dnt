@@ -59,14 +59,29 @@ const toIntent = (record: KfSyncRecord) => {
 const processRecord = async (record: KfSyncRecord, defaultOpenKfid: string) => {
   const intent = toIntent(record);
   if (!intent) {
+    console.info("[kf][sync] skip unsupported record", {
+      msgtype: record.msgtype,
+      eventType: record.event?.event_type,
+      origin: record.origin,
+    });
     return;
   }
 
   const toUser = getRecordReceiver(record);
   if (!toUser) {
+    console.info("[kf][sync] skip record without receiver", {
+      msgtype: record.msgtype,
+      eventType: record.event?.event_type,
+    });
     return;
   }
   const openKfid = getRecordOpenKfid(record, defaultOpenKfid);
+  console.info("[kf][sync] processing record", {
+    openKfid,
+    toUserSuffix: toUser.slice(-6),
+    intent: intent.type,
+    msgtype: record.msgtype,
+  });
   const send = (message: string) =>
     enqueueTask(`kf-send:${openKfid}:${toUser}`, async () => {
       await qySendKfTextMessage(toUser, openKfid, message);
@@ -79,8 +94,18 @@ export const syncKfMessages = async (input: {
   token?: string;
 }) => {
   let cursor = await getKfCursor(input.openKfid);
+  console.info("[kf][sync] start", {
+    openKfid: input.openKfid,
+    hasToken: Boolean(input.token),
+    hasCursor: Boolean(cursor),
+  });
 
   for (let idx = 0; idx < MAX_BATCHES_PER_SYNC; idx += 1) {
+    console.info("[kf][sync] fetching batch", {
+      openKfid: input.openKfid,
+      batchIndex: idx + 1,
+    });
+
     const resp = await qySyncMsg({
       openKfid: input.openKfid,
       cursor,
@@ -93,16 +118,35 @@ export const syncKfMessages = async (input: {
 
     if (resp.next_cursor && resp.next_cursor !== cursor) {
       await saveKfCursor(input.openKfid, resp.next_cursor);
+      console.info("[kf][sync] cursor advanced", {
+        openKfid: input.openKfid,
+        batchIndex: idx + 1,
+      });
       cursor = resp.next_cursor;
     }
 
     if (resp.has_more !== 1 || !resp.next_cursor) {
+      console.info("[kf][sync] finished", {
+        openKfid: input.openKfid,
+        batchIndex: idx + 1,
+        hasMore: resp.has_more,
+      });
       return;
     }
   }
+
+  console.warn("[kf][sync] reached max batches, stop current run", {
+    openKfid: input.openKfid,
+    maxBatches: MAX_BATCHES_PER_SYNC,
+  });
 };
 
-export const enqueueKfSync = (input: { openKfid: string; token?: string }) =>
-  enqueueTask(`kf-sync:${input.openKfid}`, async () => {
+export const enqueueKfSync = (input: { openKfid: string; token?: string }) => {
+  console.info("[kf][sync] enqueue", {
+    openKfid: input.openKfid,
+    hasToken: Boolean(input.token),
+  });
+  return enqueueTask(`kf-sync:${input.openKfid}`, async () => {
     await syncKfMessages(input);
   });
+};
