@@ -59,6 +59,14 @@ export default defineEventHandler(async (event) => {
   void enqueueKfSync({
     openKfid: targetOpenKfid,
     token: parsed.data.Token,
+  }).catch((error) => {
+    console.error("[kf][callback] enqueue sync failed", {
+      openKfid: targetOpenKfid,
+      error:
+        error instanceof Error
+          ? { name: error.name, message: error.message }
+          : String(error),
+    });
   });
 
   return "success";

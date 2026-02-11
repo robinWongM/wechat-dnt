@@ -6,6 +6,7 @@ import { getKfCursor, saveKfCursor } from "./cursor";
 const MAX_BATCHES_PER_SYNC = 20;
 
 type KfSyncRecord = {
+  msgid?: string;
   msgtype: string;
   origin?: number;
   open_kfid?: string;
@@ -89,6 +90,25 @@ const processRecord = async (record: KfSyncRecord, defaultOpenKfid: string) => {
   await handleIncomingMessage(intent, send);
 };
 
+const processRecordSafely = async (
+  record: KfSyncRecord,
+  defaultOpenKfid: string
+) => {
+  try {
+    await processRecord(record, defaultOpenKfid);
+  } catch (error) {
+    console.error("[kf][sync] record processing failed, skip this record", {
+      msgid: record.msgid,
+      msgtype: record.msgtype,
+      eventType: record.event?.event_type,
+      error:
+        error instanceof Error
+          ? { name: error.name, message: error.message }
+          : String(error),
+    });
+  }
+};
+
 export const syncKfMessages = async (input: {
   openKfid: string;
   token?: string;
@@ -113,7 +133,7 @@ export const syncKfMessages = async (input: {
     });
 
     for (const record of resp.msg_list) {
-      await processRecord(record, input.openKfid);
+      await processRecordSafely(record, input.openKfid);
     }
 
     if (resp.next_cursor && resp.next_cursor !== cursor) {

@@ -57,7 +57,16 @@ export default defineEventHandler(async (event) => {
       msgType: data.MsgType,
       event: data.Event ?? null,
     });
-    void handleMpEvent(data);
+    void handleMpEvent(data).catch((handleError) => {
+      console.error("[mp] event handling failed", {
+        msgType: data.MsgType,
+        event: data.Event ?? null,
+        error:
+          handleError instanceof Error
+            ? { name: handleError.name, message: handleError.message }
+            : String(handleError),
+      });
+    });
   }
 
   return "";
