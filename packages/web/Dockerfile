@@ -1,5 +1,9 @@
 FROM oven/bun:1 as build
 WORKDIR /app
+RUN apt-get update \
+  && apt-get install -y --no-install-recommends python3 make g++ \
+  && rm -rf /var/lib/apt/lists/*
+RUN bun add -g node-gyp
 COPY package.json bun.lock /app/
 COPY packages/core/package.json /app/packages/core/package.json
 COPY packages/uni-dnt/package.json /app/packages/uni-dnt/package.json
