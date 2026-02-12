@@ -133,7 +133,7 @@ export const syncKfMessages = async (input: {
     });
 
     for (const record of resp.msg_list) {
-      console.info("[kf][sync] raw record", record);
+      console.info("[kf][sync] raw record", JSON.stringify(record, null, 2));
       await processRecordSafely(record, input.openKfid);
     }
 
